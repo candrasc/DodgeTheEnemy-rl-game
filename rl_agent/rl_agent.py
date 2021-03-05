@@ -18,14 +18,20 @@ class Agent:
         """
         return position[0], position[1]
 
-    def _set_board(self, players, enemies):
+    def _set_board_positions(self, players, enemies):
         """
-        Set our np matrix using agent and enemy positions
+        set the x y cooridnates of the objects on the board without setting
+        their sizes
         """
+        # Get player center coordinates
         board = self.board.copy()
         player_position = player.get_position()
         player_x, player_y = self._get_x_y_coord(player_position)
+
+        # Get size of our player
+        player_size = player.player_size
         board[player_y][player_x] = 1
+
 
         for enemy in enemies:
             enemy_position = enemy.get_position()
@@ -34,4 +40,8 @@ class Agent:
 
         return board
 
+    def _set_full_board(self, players, enemies):
+        pass
+
     def agent_move(self, player_position, enemy_positions):
+        pass

@@ -69,9 +69,14 @@ def run_app():
 
         if collision == True:
             print('Press Space bar to play again')
+            print('Press Q to randomly reset')
             event = pygame.event.wait()
             key_input = pygame.key.get_pressed()
             if key_input[pygame.K_SPACE]:
+                Env.env_reset()
+                collision_detected == False
+
+            if key_input[pygame.K_q]:
                 Env.env_random_reset()
                 collision_detected == False
 
