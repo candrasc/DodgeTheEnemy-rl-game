@@ -61,8 +61,7 @@ while collision == False:
 
     key_input = pygame.key.get_pressed()
     move = PlayerOne.get_move(key_input)
-    player_pos = Env.move_player(move)
-    enemy_positions = Env.move_all_enemies()
+    player_pos, enemy_positions = Env.env_take_step(move)
 
     screen.blit(board, boardrect)
     screen.blit(PlayerOne.player, player_pos)

@@ -7,15 +7,18 @@ class Environment:
         self.board = board_dimensions
         self.enemies = []
         self.pos_setter = PositionSetter(board_dimensions)
-
+        # Create class attributes to keep track of the starting postions
+        # So that we can reset the game after an end_state
+        self.initial_enemies = []
+        self.initial_player = None
 
     def add_player(self, player):
         """
         In the future, can just pass Player object in... this was just nice
         to see the attributes
         """
-
         self.player = player
+        self.initial_player = player
 
 
     def move_player(self, direction):
@@ -43,6 +46,7 @@ class Environment:
 
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
+        self.initial_enemies.append(enemy)
 
     def add_enemies(self, enemies):
         for i in enemies:
@@ -77,6 +81,18 @@ class Environment:
         updated_enemies = [self.move_enemy(enemy) for enemy in self.enemies]
         self.enemies = updated_enemies
         return [enemy.get_position() for enemy in updated_enemies]
+
+    def env_take_step(self, player_move):
+        """
+        Move enemies and the player in the environment for a single step_size
+
+        Return player and enemy positions
+        """
+        new_player_pos = self.move_player(player_move)
+        new_enemy_positions = self.move_all_enemies()
+        self.check_collisions()
+
+        return new_player_pos, new_enemy_positions
 
 
     def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size):
