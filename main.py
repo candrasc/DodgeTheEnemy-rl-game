@@ -73,7 +73,7 @@ def run_app():
             event = pygame.event.wait()
             key_input = pygame.key.get_pressed()
             if key_input[pygame.K_SPACE]:
-                Env.reset_env()
+                Env.env_random_reset()
                 collision_detected == False
 
             else:

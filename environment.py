@@ -47,6 +47,13 @@ class Environment:
 
         return self.player
 
+    def create_enemy(self, size, starting_pos, velocity):
+
+        enemy = Enemy(size = size,
+                      starting_pos= starting_pos,
+                      velocity = velocity)
+        return enemy
+
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
         self.initial_enemies.append(enemy.copy())
@@ -99,15 +106,6 @@ class Environment:
 
         return new_player, new_enemies
 
-    def reset_env(self):
-        """
-        Return the environment to its starting state
-        """
-        print(self.player.get_position())
-        self.player = self.initial_player.copy()
-        print(self.player.get_position())
-        self.enemies = [enemy.copy() for enemy in self.initial_enemies]
-
     def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size):
         # print(player_size)
         player_rad = player_size/2 - 3
@@ -136,3 +134,57 @@ class Environment:
                 collisions = True
 
         return collisions
+
+    def env_reset(self):
+        """
+        Return the environment to its starting state
+        """
+        self.player = self.initial_player.copy()
+        self.enemies = [enemy.copy() for enemy in self.initial_enemies]
+
+    def env_random_reset(self,
+                     player_step_size_range = (1, 5),
+                     player_size_range = (10,40),
+                     num_enemies_range = 10,
+                     vel_range = (0, 5),
+                     enemy_size_range = (10,100)):
+        """
+        Reset the game, but all positions and enemy velocities are randomized.
+        Useful for RL training where you want to expose the agent to many states
+        """
+        def _rand_int(start, end):
+            return np.random.randint(start, end)
+
+        self.player = None
+        self.enemies = []
+        pos_range = (0, self.board[0])
+        player = Player(player_number = 1,
+                        player_size = _rand_int(player_size_range[0],
+                                                player_size_range[1],
+                                                ),
+
+                        step_size = _rand_int(player_step_size_range[0],
+                                              player_step_size_range[1],
+                                              ),
+
+                        position = (_rand_int(pos_range[0],
+                                             pos_range[1]),
+                                    _rand_int(pos_range[0],
+                                              pos_range[1])))
+
+        self.add_player(player)
+
+        for i in range(_rand_int(1, num_enemies_range)):
+            enemy = self.create_enemy(size = _rand_int(enemy_size_range[0],
+                                                       enemy_size_range[1]),
+
+                                      starting_pos = (_rand_int(vel_range[0],
+                                                           pos_range[1]),
+                                                      _rand_int(pos_range[0],
+                                                            pos_range[1])),
+
+                                      velocity = (_rand_int(vel_range[0],
+                                                           vel_range[1]),
+                                                  _rand_int(vel_range[0],
+                                                            vel_range[1])))
+            self.add_enemy(enemy)
