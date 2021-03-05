@@ -47,12 +47,6 @@ class Environment:
 
         return self.player
 
-    def create_enemy(self, size, starting_pos, velocity):
-
-        enemy = Enemy(size = size,
-                      starting_pos= starting_pos,
-                      velocity = velocity)
-        return enemy
 
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
@@ -175,16 +169,16 @@ class Environment:
         self.add_player(player)
 
         for i in range(_rand_int(1, num_enemies_range)):
-            enemy = self.create_enemy(size = _rand_int(enemy_size_range[0],
+            enemy = Enemy(size = _rand_int(enemy_size_range[0],
                                                        enemy_size_range[1]),
 
-                                      starting_pos = (_rand_int(vel_range[0],
-                                                           pos_range[1]),
-                                                      _rand_int(pos_range[0],
-                                                            pos_range[1])),
+                          starting_pos = (_rand_int(vel_range[0],
+                                               pos_range[1]),
+                                          _rand_int(pos_range[0],
+                                                pos_range[1])),
 
-                                      velocity = (_rand_int(vel_range[0],
-                                                           vel_range[1]),
-                                                  _rand_int(vel_range[0],
-                                                            vel_range[1])))
+                          velocity = (_rand_int(vel_range[0],
+                                               vel_range[1]),
+                                      _rand_int(vel_range[0],
+                                                vel_range[1])))
             self.add_enemy(enemy)
