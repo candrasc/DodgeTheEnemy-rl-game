@@ -61,13 +61,12 @@ def run_app():
 
         key_input = pygame.key.get_pressed()
         move = PlayerOne.get_move(key_input)
-        player, enemies = Env.env_take_step(move)
+        player, enemies, collision = Env.env_take_step(move)
 
         screen.blit(board, boardrect)
         screen.blit(player.player, player.get_position())
         update_enemies_ingame(enemies)
 
-        collision = Env.check_collisions()
         if collision == True:
             print('Press Space bar to play again')
             event = pygame.event.wait()

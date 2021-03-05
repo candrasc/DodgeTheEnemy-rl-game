@@ -96,9 +96,9 @@ class Environment:
 
         new_player = self.move_player(player_move)
         new_enemies = self.move_all_enemies()
-        self.check_collisions()
+        collision = self.check_collisions()
 
-        return new_player, new_enemies
+        return new_player, new_enemies, collision
 
     def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size):
         # print(player_size)
