@@ -11,6 +11,7 @@ class Environment:
         # So that we can reset the game after an end_state
         self.initial_enemies = []
         self.initial_player = None
+        self.player = None
 
     def add_player(self, player):
         """
@@ -18,8 +19,10 @@ class Environment:
         to see the attributes
         """
         self.player = player
-        self.initial_player = player
+        self.initial_player = self.player.copy()
 
+    def get_player(self):
+        return self.player
 
     def move_player(self, direction):
         position = self.pos_setter
@@ -42,11 +45,11 @@ class Environment:
         new_pos = position.get_position()
         self.player.set_position(new_pos)
 
-        return new_pos
+        return self.player
 
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
-        self.initial_enemies.append(enemy)
+        self.initial_enemies.append(enemy.copy())
 
     def add_enemies(self, enemies):
         for i in enemies:
@@ -80,7 +83,8 @@ class Environment:
     def move_all_enemies(self):
         updated_enemies = [self.move_enemy(enemy) for enemy in self.enemies]
         self.enemies = updated_enemies
-        return [enemy.get_position() for enemy in updated_enemies]
+        [enemy.get_position() for enemy in updated_enemies]
+        return updated_enemies
 
     def env_take_step(self, player_move):
         """
@@ -88,12 +92,21 @@ class Environment:
 
         Return player and enemy positions
         """
-        new_player_pos = self.move_player(player_move)
-        new_enemy_positions = self.move_all_enemies()
+
+        new_player = self.move_player(player_move)
+        new_enemies = self.move_all_enemies()
         self.check_collisions()
 
-        return new_player_pos, new_enemy_positions
+        return new_player, new_enemies
 
+    def reset_env(self):
+        """
+        Return the environment to its starting state
+        """
+        print(self.player.get_position())
+        self.player = self.initial_player.copy()
+        print(self.player.get_position())
+        self.enemies = [enemy.copy() for enemy in self.initial_enemies]
 
     def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size):
         # print(player_size)

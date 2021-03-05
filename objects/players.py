@@ -1,7 +1,8 @@
 import pygame
+import copy
 
 class Player:
-    def __init__(self, player_number, player_size = 30, step_size = 0.3, position = (1,1)):
+    def __init__(self, player_number=1, player_size = 30, step_size = 0.3, position = (1,1)):
 
         if player_number == 1:
             self.player = pygame.image.load("objects/object_images/player_one.png").convert()
@@ -18,7 +19,6 @@ class Player:
 
     def get_move(self, key_input):
 
-
         if key_input[pygame.K_LEFT]:
             return 0
         if key_input[pygame.K_UP]:
@@ -34,6 +34,15 @@ class Player:
 
     def get_position(self):
         return self.position
+
+    def copy(self):
+        copyobj = Player()
+        for name, attr in self.__dict__.items():
+            if hasattr(attr, 'copy') and callable(getattr(attr, 'copy')):
+                copyobj.__dict__[name] = attr.copy()
+            else:
+                copyobj.__dict__[name] = copy.deepcopy(attr)
+        return copyobj
 
 class Enemy:
     """
@@ -68,3 +77,12 @@ class Enemy:
 
     def get_position(self):
         return self.position
+
+    def copy(self):
+        copyobj = Enemy()
+        for name, attr in self.__dict__.items():
+            if hasattr(attr, 'copy') and callable(getattr(attr, 'copy')):
+                copyobj.__dict__[name] = attr.copy()
+            else:
+                copyobj.__dict__[name] = copy.deepcopy(attr)
+        return copyobj
