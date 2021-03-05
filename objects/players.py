@@ -9,9 +9,9 @@ class Player:
             self.player = pygame.image.load("objects/object_images/player_two.png").convert()
 
         self.player_number = player_number
-        self.player_size = player_size
+        self.size = player_size
         self.step_size = step_size
-        self.player = pygame.transform.scale(self.player,(self.player_size, self.player_size))
+        self.player = pygame.transform.scale(self.player,(self.size, self.size))
         self._rect = self.player.get_rect()
         self.position = position
 
