@@ -24,7 +24,7 @@ class Environment:
     def move_player(self, direction):
         position = self.pos_setter
 
-        position.set_object(self.player.player_size,
+        position.set_object(self.player.size,
                             self.player.get_position())
 
         step = self.player.step_size
@@ -113,12 +113,13 @@ class Environment:
     def check_collisions(self):
 
         player_pos = self.player.get_position()
-        player_size = self.player.player_size
+        player_size = self.player.size
         enemy_positions = [enemy.get_position() for enemy in self.enemies]
         enemy_sizes = [enemy.size for enemy in self.enemies]
 
-        collisions = []
+        collisions = False
         for i in range(len(self.enemies)):
-            collisions.append(self._contact_made(player_pos, enemy_positions[i], player_size, enemy_sizes[i]))
+            if self._contact_made(player_pos, enemy_positions[i], player_size, enemy_sizes[i]) == True:
+                collisions = True
 
         return collisions

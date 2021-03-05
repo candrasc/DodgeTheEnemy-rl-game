@@ -1,5 +1,5 @@
 import sys, pygame
-from game import Environment
+from environment import Environment
 from objects.players import Player, Enemy
 
 
@@ -67,9 +67,7 @@ while collision == False:
     screen.blit(PlayerOne.player, player_pos)
     update_enemies_ingame(enemies, enemy_positions)
 
-    collisions = Env.check_collisions()
-    if True in collisions:
-        collision = True
+    collision = Env.check_collisions()
 
     pygame.display.update()
 
