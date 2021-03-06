@@ -149,8 +149,12 @@ class Environment:
         def _rand_int(start, end):
             return np.random.randint(start, end)
 
+        # First clear out all player and enemy attributes
         self.player = None
+        self.initial_player = None
         self.enemies = []
+        self.initial_enemies = []
+
         pos_range = (0, self.board[0])
         player = Player(player_number = 1,
                         player_size = _rand_int(player_size_range[0],
