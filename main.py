@@ -1,6 +1,20 @@
-import sys, pygame
+import sys, pygame, json
 from environment import Environment
 from objects.players import Player, Enemy
+
+with open("game_config.json", "rb") as f:
+    config = json.load(f)
+
+p_con = config['player_configs']
+e_con = config['enemy_configs']
+
+player_size_range = p_con['player_size_range']
+player_step_size_range = p_con['player_step_size_range']
+
+num_enemies_range = e_con['num_enemies_range']
+enemy_velocity_range = e_con['enemy_velocity_range']
+enemy_size_range = e_con['enemy_size_range']
+
 
 
 def run_app():
@@ -21,28 +35,11 @@ def run_app():
 
     Env = Environment(size)
 
-    PlayerOne = Player(player_number = 1,
-                       player_size = 30,
-                       step_size = 3,
-                       position = (1,1))
-
-    Env.add_player(PlayerOne)
-
-    EnemyOne = Enemy(size = 100,
-                     starting_pos=(500, 400),
-                     velocity = (1, 1))
-
-    EnemyTwo = Enemy(size = 50,
-                     starting_pos=(300, 300),
-                     velocity = (2, 2))
-
-    EnemyThree = Enemy(size = 30,
-                     starting_pos=(100, 300),
-                     velocity = (4, 3))
-
-    enemies = [EnemyOne, EnemyTwo, EnemyThree]
-
-    Env.add_enemies(enemies)
+    Env.random_initialize(player_step_size_range = player_step_size_range,
+                         player_size_range = player_size_range,
+                         num_enemies_range = num_enemies_range,
+                         vel_range = enemy_velocity_range,
+                         enemy_size_range = enemy_size_range)
 
 
     def update_enemies_ingame(enemies):
@@ -50,6 +47,7 @@ def run_app():
         for enemy in enemies:
             screen.blit(enemy.enemy, enemy.get_position())
 
+    # Start game loop
     collision_detected = False
     while collision_detected == False:
         # Clock locks framerate and prevents stuttering
@@ -60,7 +58,7 @@ def run_app():
                 sys.exit()
 
         key_input = pygame.key.get_pressed()
-        move = PlayerOne.get_move(key_input)
+        move = Env.player.get_move(key_input)
         player, enemies, collision = Env.env_take_step(move)
 
         screen.blit(board, boardrect)
@@ -79,12 +77,12 @@ def run_app():
                 collision_detected == False
 
             if key_input[pygame.K_q]:
-                Env.random_initialize(player_step_size_range = (3, 4),
-                                     player_size_range = (30, 31),
-                                     num_enemies_range = (4, 10),
-                                     vel_range = (0, 5),
-                                     enemy_size_range = (10,100))
-                                     
+                Env.random_initialize(player_step_size_range = player_step_size_range,
+                                     player_size_range = player_size_range,
+                                     num_enemies_range = num_enemies_range,
+                                     vel_range = enemy_velocity_range,
+                                     enemy_size_range = enemy_size_range)
+
                 collision_detected == False
 
             else:
