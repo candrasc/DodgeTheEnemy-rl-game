@@ -9,8 +9,12 @@ class Agent:
     def __init__(self, env):
         self.env = environment
         self.board = np.zeros(env.board)
+        # What values will represent the player and the enemies in our state
+        # We will pass an np matrix of zeros, ones, and twos as inputs...
+        # If that doesn't work we can describe the state space as the closest 4 enemies
+        # their positions, and their velocities
         self.player_vals = 1
-        self.enemy_cals = 2
+        self.enemy_vals = 2
 
     def _get_x_y_coord(self, position):
         """

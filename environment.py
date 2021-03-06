@@ -102,7 +102,7 @@ class Environment:
 
     def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size):
         # print(player_size)
-        player_rad = player_size/2 - 3
+        player_rad = player_size/2 
         enemy_rad = enemy_size/2
         w1 = player_pos[0] + player_rad
         h1 = player_pos[1] + player_rad
@@ -136,12 +136,12 @@ class Environment:
         self.player = self.initial_player.copy()
         self.enemies = [enemy.copy() for enemy in self.initial_enemies]
 
-    def env_random_reset(self,
-                     player_step_size_range = (1, 5),
-                     player_size_range = (10,40),
-                     num_enemies_range = 10,
-                     vel_range = (0, 5),
-                     enemy_size_range = (10,100)):
+    def random_initialize(self,
+                         player_step_size_range = (1, 5),
+                         player_size_range = (10,40),
+                         num_enemies_range = (3,10),
+                         vel_range = (0, 5),
+                         enemy_size_range = (10,100)):
         """
         Reset the game, but all positions and enemy velocities are randomized.
         Useful for RL training where you want to expose the agent to many states
@@ -172,7 +172,7 @@ class Environment:
 
         self.add_player(player)
 
-        for i in range(_rand_int(1, num_enemies_range)):
+        for i in range(_rand_int(num_enemies_range[0], num_enemies_range[1])):
             enemy = Enemy(size = _rand_int(enemy_size_range[0],
                                                        enemy_size_range[1]),
 

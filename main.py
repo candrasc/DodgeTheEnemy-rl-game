@@ -79,7 +79,12 @@ def run_app():
                 collision_detected == False
 
             if key_input[pygame.K_q]:
-                Env.env_random_reset()
+                Env.random_initialize(player_step_size_range = (3, 4),
+                                     player_size_range = (30, 31),
+                                     num_enemies_range = (4, 10),
+                                     vel_range = (0, 5),
+                                     enemy_size_range = (10,100))
+                                     
                 collision_detected == False
 
             else:
