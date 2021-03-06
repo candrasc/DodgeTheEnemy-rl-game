@@ -1,5 +1,16 @@
 import numpy as np
+"""
+Get closest non zero in array https://stackoverflow.com/questions/43306291/find-the-nearest-nonzero-element-and-corresponding-index-in-a-2d-numpy-array
 
+Will do similar to above for state value
+1) Given the position of the player and positions of all enemies, find the distance from player to all enemies
+given player and enemy radius (This isn't perfect for diagnols, but it is good enough...)
+
+2) State vector will be a fixed size to accomdate x enemies. Features will include
+    - Board dimensions
+    - Player position, player step size
+    - For each enemy: position, velocity
+"""
 
 class Agent:
     """
