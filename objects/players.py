@@ -89,7 +89,7 @@ class Enemy(NonPlayerBase):
         self.enemy = pygame.transform.scale(self.enemy,(self.size, self.size))
 
 
-class Reward:
+class Reward(NonPlayerBase):
     """
     Items the player is trying to collect for points
     """
