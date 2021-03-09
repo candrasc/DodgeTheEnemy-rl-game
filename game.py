@@ -136,30 +136,27 @@ def play_victory_screen(screen, victory_screen, victory):
         screen.blit(victory_screen, (50,50))
         pygame.display.update()
 
-        event = pygame.event.wait()
-        key_input = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
+        key_input = pygame.key.get_pressed()
         if key_input[pygame.K_SPACE] or key_input[pygame.K_q]:
             victory = False
-        return
+            return
 
 def play_game_over_screen(screen, game_over, collision):
-    pygame.init()
     black = (0,0,0)
     while collision == True:
         screen.fill(black)
         screen.blit(game_over, (50,100))
         pygame.display.update()
 
-        key_input = pygame.key.get_pressed()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
+        key_input = pygame.key.get_pressed()
         if key_input[pygame.K_SPACE] or key_input[pygame.K_q]:
             collision = False
-        return
+            return
