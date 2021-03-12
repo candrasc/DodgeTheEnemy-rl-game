@@ -1,7 +1,7 @@
 """
 This file stores the main functions that our main.py will use to run the game
 """
-from environment import Environment
+from environment.environment import Environment
 import pygame, sys
 
 def initialize_env(config, board_size = (700, 700)):
@@ -47,10 +47,10 @@ def create_static_images(board_size = (700, 700)):
     board = pygame.transform.scale(board, size)
     boardrect = board.get_rect()
 
-    game_over = pygame.image.load('images/game_over.png').convert()
-    game_over = pygame.transform.scale(game_over, (600,300))
+    game_over = pygame.image.load('images/you_lose.jpg').convert()
+    game_over = pygame.transform.scale(game_over, (600,600))
 
-    victory_screen = pygame.image.load('images/victory_screen.gif').convert()
+    victory_screen = pygame.image.load('images/victory.jpg').convert()
     victory_screen = pygame.transform.scale(victory_screen, (600, 600))
 
     clock = pygame.time.Clock()
@@ -149,7 +149,7 @@ def play_game_over_screen(screen, game_over, collision):
     black = (0,0,0)
     while collision == True:
         screen.fill(black)
-        screen.blit(game_over, (50,100))
+        screen.blit(game_over, (50,50))
         pygame.display.update()
 
         for event in pygame.event.get():
