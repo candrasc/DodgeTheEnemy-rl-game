@@ -3,6 +3,7 @@ This file stores the main functions that our main.py will use to run the game
 """
 from environment.environment import Environment
 import pygame, sys
+from rl_agent.state_translator import StateTranslator
 
 def initialize_env(config, board_size = (700, 700)):
 
@@ -80,6 +81,8 @@ def run_game(Env, board, screen, clock):
     collision_detected = False
     victory = False
 
+    import pickle
+    state_trans = StateTranslator(Env, 2)
     while collision_detected == False and victory == False:
         # Clock locks framerate and prevents stuttering
         clock.tick(100)
@@ -95,6 +98,11 @@ def run_game(Env, board, screen, clock):
         collision and rewards collected are boolean
         """
         player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
+        # state_trans.set_objects(player, enemies, rewards)
+        # state_eg = state_trans.get_state()
+        # print((state_eg))
+        # with open(r"state_eg.pkl", "wb") as f:
+        #     pickle.dump(state_eg, f)
 
         screen.blit(board, boardrect)
         screen.blit(player.player, player.get_position())

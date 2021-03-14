@@ -1,2 +1,6 @@
 *.pyc
 __pycache__/
+testing.ipynb
+*.ipynb_checkpoints
+
+objects\__pycache__\players.cpython-38.pyc

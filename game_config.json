@@ -1,7 +1,7 @@
 {
   "enemy_configs":{
-    "num_enemies_range": [7, 8],
-    "enemy_velocity_range": [0, 4],
+    "num_enemies_range": [4, 5],
+    "enemy_velocity_range": [1, 4],
     "enemy_size_range": [30, 100]
   },
   "player_configs":{
@@ -9,7 +9,7 @@
     "player_size_range": [30, 31]
   },
   "reward_configs":{
-    "num_rewards_range": [10, 11],
+    "num_rewards_range": [5, 6],
     "reward_velocity_range": [1, 2],
     "reward_size_range": [15, 16]
   }
