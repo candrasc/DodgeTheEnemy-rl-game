@@ -133,7 +133,7 @@ class StateTranslator:
     def get_state(self):
         """
         Create the final np vector that will be passed to the RL agent
-        """
+        """        
         n_obj_goods = min(self.n_obj, len(self.goods))
         n_obj_enemies = min(self.n_obj, len(self.enemies))
 
@@ -201,4 +201,5 @@ class StateTranslator:
                           gs,
                           gv])
 
-        return np.hstack(state)
+        state = np.hstack(state)
+        return state

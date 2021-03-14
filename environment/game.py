@@ -81,8 +81,7 @@ def run_game(Env, board, screen, clock):
     collision_detected = False
     victory = False
 
-    import pickle
-    state_trans = StateTranslator(Env, 2)
+    state_trans = StateTranslator(Env, 8)
     while collision_detected == False and victory == False:
         # Clock locks framerate and prevents stuttering
         clock.tick(100)
@@ -97,9 +96,14 @@ def run_game(Env, board, screen, clock):
         Return the player class, list of enemy classes, uncollected rewards,
         collision and rewards collected are boolean
         """
+        # before_step = datetime.datetime.now()
         player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
+        # print('step complete: ', datetime.datetime.now() - before_step)
+        #
+        # before_trans = datetime.datetime.now()
         # state_trans.set_objects(player, enemies, rewards)
         # state_eg = state_trans.get_state()
+        # print('trans complete: ', datetime.datetime.now() - before_trans)
         # print((state_eg))
         # with open(r"state_eg.pkl", "wb") as f:
         #     pickle.dump(state_eg, f)
