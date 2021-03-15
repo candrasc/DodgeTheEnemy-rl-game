@@ -1,6 +1,8 @@
 from objects.position import PositionSetter
 from objects.players import Player, Enemy, Reward
+from rl_agent.state_translator import StateTranslator
 import numpy as np
+import random
 
 class Environment:
     def __init__(self, board_dimensions = (720, 720)):
@@ -15,6 +17,7 @@ class Environment:
         self.initial_player = None
         self.initial_rewards = []
         self.score = None
+        self.action_space = [0,1,2,3]
 
     def add_player(self, player):
         """
@@ -239,14 +242,22 @@ class Environment:
 
         self.add_player(player)
 
+        player_pos = player.get_position()
+        avoid_squares_x = list(range(player_pos[0] - 50, player_pos[0] + 50))
+
+        avoid_squares_y = list(range(player_pos[1] - 50, player_pos[1] + 50))
+
         for i in range(_rand_int(num_enemies_range[0], num_enemies_range[1])):
+            e_pos_x = random.choice(list(set(range(pos_range[0], pos_range[1]))-set(avoid_squares_x)))
+            e_pos_y = random.choice(list(set(range(pos_range[0], pos_range[1]))-set(avoid_squares_y)))
+
             enemy = Enemy(size = _rand_int(enemy_size_range[0],
                                                        enemy_size_range[1]),
 
-                          starting_pos = (_rand_int(e_vel_range[0],
-                                               pos_range[1]),
-                                          _rand_int(pos_range[0],
-                                                pos_range[1])),
+
+
+                          starting_pos = (e_pos_x,
+                                          e_pos_y),
 
                           velocity = (_rand_int(e_vel_range[0],
                                                e_vel_range[1]),
