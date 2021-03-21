@@ -4,8 +4,6 @@ Get closest non zero in array https://stackoverflow.com/questions/30368632/calcu
 Will do similar to above for state value
 1) Given the position of the player and positions of all enemies, find the distance from player to all enemies
 given player and enemy radius (This isn't perfect for diagnols, but it is good enough...)
-    - For each object, calculate 8 points for each (4 corners and midpoints for each side). Find distance for each
-    point on A to each point on B and use the shortest as the distance value (8*8 checks (64) per object pair)
 
 2) State vector will be a fixed size to accomdate x enemies. Features will include
     - Distance from each edge of the board (4)
@@ -20,10 +18,16 @@ class StateTranslator:
     vector that can be passed to the RL agent
     """
 
-    def __init__(self, env, n_objects_in_state = 8):
+    def __init__(self, env, n_objects_in_state = 4):
         self.env = env
         self.board = np.zeros(env.board)
         self.n_obj = n_objects_in_state
+        self.state_shape = (2*( 2*self.n_obj + self.n_obj + 2*self.n_obj) + # enemy and goods
+                            (2 + 1 + 1)) # player attributes
+        # Factors to divide state attributes by so they are less than 1
+        self.size_scale = 100 # max object size
+        self.position_scale = env.board[0] # max board dimension
+        self.velocity_scale = 10 # max velocity
 
     def _get_x_y_coord(self, position):
         """
@@ -103,12 +107,9 @@ class StateTranslator:
         and radius... even though they are squares, this is good enough
         (the sizes will be inputs into the NN so it will be figured out then)
         """
-        #############
-        # Need to add logic somewhere, that if n_obj is greater than the list,
-        # just return 0s in place
+
         if len(obj_sizes)<=n_obj:
             n_smallest_indicies = [i for i in range(len(obj_sizes))]
-        #############
 
         else:
             distances = np.array([])
@@ -123,6 +124,10 @@ class StateTranslator:
         return n_smallest_indicies
 
     def __fill_end_of_array(self, array, desired_length):
+        """When their are less objects than our maxmimum amount (n_obj),
+        we fill the end of the array with zeros so that the state size is
+        always the same
+        """
 
         if len(array) < desired_length:
             num_to_add = desired_length - len(array)
@@ -133,7 +138,7 @@ class StateTranslator:
     def get_state(self):
         """
         Create the final np vector that will be passed to the RL agent
-        """        
+        """
         n_obj_goods = min(self.n_obj, len(self.goods))
         n_obj_enemies = min(self.n_obj, len(self.enemies))
 
@@ -187,19 +192,39 @@ class StateTranslator:
         state = np.array([])
 
         state = np.append(state,
-                         [player_pos,
-                          player_size,
-                          player_step_size])
+                         [player_pos/self.position_scale,
+                          player_size/self.size_scale,
+                          player_step_size/self.velocity_scale])
 
         state = np.append(state,
-                         [ep,
-                          es,
-                          ev])
+                         [ep/self.position_scale,
+                          es/self.size_scale,
+                          ev/self.velocity_scale])
 
         state = np.append(state,
-                         [gp,
-                          gs,
-                          gv])
+                         [gp/self.position_scale,
+                          gs/self.size_scale,
+                          gv/self.velocity_scale])
 
         state = np.hstack(state)
-        return state
+        return state.flatten()
+
+
+    def state_translation(self, collision, goods_collected):
+        """Used to translate state into format similar to OpenAi gym
+        allow agent to train
+        """
+
+        Done = False
+        Reward = -1
+        state = self.get_state()
+
+        if collision:
+            Done = True
+            Reward = -100
+
+        if goods_collected:
+            Done = True
+            Reward = +100
+
+        return state, Reward, Done

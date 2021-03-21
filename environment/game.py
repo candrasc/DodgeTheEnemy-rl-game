@@ -4,6 +4,7 @@ This file stores the main functions that our main.py will use to run the game
 from environment.environment import Environment
 import pygame, sys
 from rl_agent.state_translator import StateTranslator
+import datetime
 
 def initialize_env(config, board_size = (700, 700)):
 
@@ -58,30 +59,44 @@ def create_static_images(board_size = (700, 700)):
 
     return screen, board, game_over, victory_screen, clock
 
+def update_objects_ingame(screen, objects, enemies = True):
+    """
+    Need to refactor the enemy and reward class to have their display object
+    use the same attribute name... can then pass either to this function
+    and don't need the enemies=True param
+    """
+    if enemies:
+        positions = [i.get_position() for i in objects]
+        for i in objects:
+            screen.blit(i.enemy, i.get_position())
+    if not enemies:
+        positions = [i.get_position() for i in objects]
+        for i in objects:
+            screen.blit(i.reward, i.get_position())
 
 def run_game(Env, board, screen, clock):
     black = (0,0,0)
     boardrect = board.get_rect()
-
-    def update_objects_ingame(objects, enemies = True):
-        """
-        Need to refactor the enemy and reward class to have their display object
-        use the same attribute name... can then pass either to this function
-        and don't need the enemies=True param
-        """
-        if enemies:
-            positions = [i.get_position() for i in objects]
-            for i in objects:
-                screen.blit(i.enemy, i.get_position())
-        if not enemies:
-            positions = [i.get_position() for i in objects]
-            for i in objects:
-                screen.blit(i.reward, i.get_position())
+    #
+    # def update_objects_ingame(objects, enemies = True):
+    #     """
+    #     Need to refactor the enemy and reward class to have their display object
+    #     use the same attribute name... can then pass either to this function
+    #     and don't need the enemies=True param
+    #     """
+    #     if enemies:
+    #         positions = [i.get_position() for i in objects]
+    #         for i in objects:
+    #             screen.blit(i.enemy, i.get_position())
+    #     if not enemies:
+    #         positions = [i.get_position() for i in objects]
+    #         for i in objects:
+    #             screen.blit(i.reward, i.get_position())
 
     collision_detected = False
     victory = False
 
-    state_trans = StateTranslator(Env, 8)
+    state_trans = StateTranslator(Env, 4)
     while collision_detected == False and victory == False:
         # Clock locks framerate and prevents stuttering
         clock.tick(100)
@@ -92,26 +107,70 @@ def run_game(Env, board, screen, clock):
 
         key_input = pygame.key.get_pressed()
         move = Env.player.get_move(key_input)
+
+
         """
         Return the player class, list of enemy classes, uncollected rewards,
         collision and rewards collected are boolean
         """
         # before_step = datetime.datetime.now()
         player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
-        # print('step complete: ', datetime.datetime.now() - before_step)
-        #
-        # before_trans = datetime.datetime.now()
-        # state_trans.set_objects(player, enemies, rewards)
-        # state_eg = state_trans.get_state()
-        # print('trans complete: ', datetime.datetime.now() - before_trans)
-        # print((state_eg))
-        # with open(r"state_eg.pkl", "wb") as f:
-        #     pickle.dump(state_eg, f)
+        state_trans.set_objects(player, enemies, rewards)
+        _, reward, _ = state_trans.state_translation(collision, rewards_collected)
+        #print(reward)
 
         screen.blit(board, boardrect)
         screen.blit(player.player, player.get_position())
-        update_objects_ingame(enemies, enemies = True)
-        update_objects_ingame(rewards, enemies = False)
+        update_objects_ingame(screen, enemies, enemies = True)
+        update_objects_ingame(screen, rewards, enemies = False)
+        pygame.display.update()
+
+        if len(rewards) == 0:
+            victory = True
+            return victory, collision_detected
+
+        if collision == True:
+            collision_detected = True
+            return victory, collision_detected
+
+
+def run_game_with_agent(agent, Env, board, screen, clock):
+    black = (0,0,0)
+    boardrect = board.get_rect()
+
+    collision_detected = False
+    victory = False
+
+    while collision_detected == False and victory == False:
+        # Clock locks framerate and prevents stuttering
+        clock.tick(50)
+        screen.fill(black)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+        player, enemies, goods = Env.return_cur_env()
+
+
+        #start = datetime.datetime.now()
+        agent.StateTrans.set_objects(player, enemies, goods)
+        cur_state = agent.StateTrans.get_state()
+    
+        #print(cur_state)
+        #print('state trans:', datetime.datetime.now() - start)
+        move = agent.act(cur_state)
+        #print('move', datetime.datetime.now() - start)
+        """
+        Return the player class, list of enemy classes, uncollected rewards,
+        collision and rewards collected are boolean
+        """
+
+        player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
+
+        screen.blit(board, boardrect)
+        screen.blit(player.player, player.get_position())
+        update_objects_ingame(screen, enemies, enemies = True)
+        update_objects_ingame(screen, rewards, enemies = False)
         pygame.display.update()
 
         if len(rewards) == 0:

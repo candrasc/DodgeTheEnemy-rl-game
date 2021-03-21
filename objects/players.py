@@ -1,14 +1,24 @@
 import pygame
 import copy
+import os, inspect
+
+current_directory = os.path.dirname(
+                    os.path.abspath(inspect.stack()[0][1]))
 
 class Player:
     def __init__(self, player_number=1, player_size = 30, step_size = 0.3, position = (1,1)):
 
-        self.player = pygame.image.load("objects/object_images/player_one.png").convert()
+        player_path = os.sep.join([current_directory, 'object_images/player_one.png '])
+        try:
+            self.player = pygame.image.load(player_path).convert()
+            self.player = pygame.transform.scale(self.player,(player_size, player_size))
+        except:
+            pass
+
         self.player_number = player_number
         self.size = player_size
         self.step_size = step_size
-        self.player = pygame.transform.scale(self.player,(self.size, self.size))
+
         self.position = position
 
 
@@ -85,9 +95,12 @@ class Enemy(NonPlayerBase):
     """
     def __init__(self,  size = 30, step_size = 0.3, starting_pos = (1,1), velocity=(1,1)):
         super().__init__(size, step_size, starting_pos, velocity)
-        self.enemy = pygame.image.load("objects/object_images/enemy.png").convert()
-        self.enemy = pygame.transform.scale(self.enemy,(self.size, self.size))
-
+        enemy_path = os.sep.join([current_directory, "object_images/enemy.png"])
+        try:
+            self.enemy = pygame.image.load(enemy_path).convert()
+            self.enemy = pygame.transform.scale(self.enemy,(self.size, self.size))
+        except:
+            pass
 
 class Reward(NonPlayerBase):
     """
@@ -95,6 +108,10 @@ class Reward(NonPlayerBase):
     """
     def __init__(self, reward_value = 10, size = 30, step_size = 0.3, starting_pos = (1,1), velocity=(1,1)):
         super().__init__(size, step_size, starting_pos, velocity)
-        self.reward = pygame.image.load("objects/object_images/reward_one.png").convert()
-        self.reward = pygame.transform.scale(self.reward, (self.size, self.size))
+        reward_path = os.sep.join([current_directory, "object_images/reward_one.png"])
+        try:
+            self.reward = pygame.image.load(reward_path).convert()
+            self.reward = pygame.transform.scale(self.reward, (self.size, self.size))
+        except:
+            pass
         self.reward_value = reward_value

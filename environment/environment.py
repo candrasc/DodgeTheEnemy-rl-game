@@ -5,7 +5,7 @@ import numpy as np
 import random
 
 class Environment:
-    def __init__(self, board_dimensions = (720, 720)):
+    def __init__(self, board_dimensions = (700, 700)):
         self.board = board_dimensions
         self.pos_setter = PositionSetter(board_dimensions)
         # Create class attributes to keep track of the starting postions
@@ -151,6 +151,9 @@ class Environment:
         collision, rewards_collected = self.check_collisions()
 
         return new_player, new_enemies, new_rewards, collision, rewards_collected
+
+    def return_cur_env(self):
+        return self.player, self.enemies, self.rewards
 
     def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size):
         # print(player_size)
