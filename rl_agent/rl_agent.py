@@ -98,19 +98,20 @@ class Agent:
     def save_model(self, fn):
         self.model.save(fn)
 
-"""
-Try a state that includes distances to objects from player instead of the carinal positions
-"""
+
 
 from environment.environment import Environment
 
 def main():
     """
-    I think there is an issue with how I represent states... since the state
-    takes in the closest n objects, the objects can change their location in the
-    state position, which may make things more difficult for the nn to understand.
+    Script to train Agent
+    Currently combine every 4 steps into one state and take an action for 4
+    steps
 
-    Will likely have to just represent each state as a 700*700 grid...
+    Trials are not ended when the agent ends the game... they are just there to
+    help save the agent improvement over time
+
+    Instead the trial will continue, but the environment will random reset
     """
 
     env = Environment((700,700))
@@ -119,12 +120,12 @@ def main():
     epsilon = .95
     min_epsilon = 0.05
     min_epsilon
-    # We random reset the env after every finish... trials are just for model saving
-    # checkpoint purposes
+
     trials  = 50
     trial_len = 1000
-    model = keras.models.load_model('good_performance_using_stable_rewards/trial-17_model_d_from_p_state')
-    # updateTargetNetwork = 1000
+    # Can load a previous model to speed up learning if you want
+    #model = keras.models.load_model('good_performance_using_stable_rewards/trial-17_model_d_from_p_state')
+
     dqn_agent = Agent(env=env,
                       model = model,
                       epsilon = epsilon,
@@ -134,10 +135,10 @@ def main():
     steps = []
     for trial in range(trials):
         print('trial', trial)
-        #dqn_agent.epsilon = 1
+
         env.random_initialize(player_step_size_range = [4, 5],
                              player_size_range = [30, 31],
-                            # Let's see if it can learn to avoid one enemy and collect rewards
+
                              num_enemies_range = [5, 6],
                              e_vel_range = [1, 4],
                              enemy_size_range = [30, 31],
@@ -149,7 +150,7 @@ def main():
 
         player, enemies, goods = env.return_cur_env()
 
-        # Repeat same state 4 times to start to get right length
+        # Repeat same state 4 times to start to get right length of state vec
         cur_state = np.array([])
         action_start = np.random.randint(0, 4)
         for i in range(num_steps_per_move):
@@ -158,7 +159,7 @@ def main():
             cur_state_mini = dqn_agent.StateTrans.get_state()
             cur_state = np.append(cur_state, cur_state_mini)
 
-        # Reset exploration at the start of each new random state
+
         print('state_shape1', len(cur_state))
         for step in range(trial_len):
             if step % 100 == 0:
@@ -201,7 +202,7 @@ def main():
 
             if done:
                 print('done', reward)
-                # break
+
                 env.random_initialize(player_step_size_range = [4, 5],
                                      player_size_range = [30, 31],
                                     # Let's see if it can learn to avoid one enemy and collect rewards
@@ -216,6 +217,7 @@ def main():
 
                 player, enemies, goods = env.return_cur_env()
 
+                # Random restart the env after completion
                 cur_state = np.array([])
                 action_start = np.random.randint(0, 4)
                 for i in range(num_steps_per_move):
@@ -224,6 +226,7 @@ def main():
                     cur_state_mini = dqn_agent.StateTrans.get_state()
                     cur_state = np.append(cur_state, cur_state_mini)
 
+            # Every 100 steps we save our model progress
             if step >= 100:
 
                 if step % 100 == 0:
