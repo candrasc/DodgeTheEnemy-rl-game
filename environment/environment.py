@@ -146,8 +146,14 @@ class Environment:
         """
 
         new_player = self.move_player(player_move)
-        new_enemies = self.move_all_enemies()
+        if len(self.enemies) > 0:
+            new_enemies = self.move_all_enemies()
+        else:
+            new_enemies = []
         new_rewards = self.move_all_rewards()
+
+        # There is a very rare bug with check collisions trying to pop rewards and failing
+
         collision, rewards_collected = self.check_collisions()
 
         return new_player, new_enemies, new_rewards, collision, rewards_collected
@@ -175,24 +181,37 @@ class Environment:
         player_pos = self.player.get_position()
         player_size = self.player.size
 
-        enemy_positions, enemy_sizes = zip(*((enemy.get_position(), enemy.size)
-                                                for enemy in self.enemies))
-
-
-        reward_positions, reward_sizes = zip(*((reward.get_position(), reward.size)
-                                                for reward in self.rewards))
 
         collisions = False
-        for i in range(len(self.enemies)):
-            if self._contact_made(player_pos, enemy_positions[i], player_size, enemy_sizes[i]) == True:
-                collisions = True
+        if len(self.enemies)>0:
+            enemy_positions, enemy_sizes = zip(*((enemy.get_position(), enemy.size)
+                                                    for enemy in self.enemies))
+
+            for i in range(len(self.enemies)):
+                if self._contact_made(player_pos, enemy_positions[i], player_size, enemy_sizes[i]) == True:
+                    collisions = True
 
         rewards_collected = False
-        for i in range(len(self.rewards)):
-            if self._contact_made(player_pos, reward_positions[i], player_size, reward_sizes[i]) == True:
-                if len(self.rewards)>0:
-                    self.rewards.pop(i)
-                rewards_collected = True
+        if len(self.rewards)>0:
+            reward_positions, reward_sizes = zip(*((reward.get_position(), reward.size)
+                                                    for reward in self.rewards))
+
+
+
+            for i in range(len(self.rewards)):
+                if self._contact_made(player_pos, reward_positions[i], player_size, reward_sizes[i]) == True:
+                    try:
+                        if len(self.rewards)>0:
+                            self.rewards.pop(i)
+                        rewards_collected = True
+                    except:
+                        import pickle
+                        error_dict = {'rewards_positions': reward_positions,
+                                      'rewards_sizes':reward_sizes,
+                                      'iteration': i}
+                        with open('reward_error.pkl', 'wb') as f:
+                            pickle.dump(error_dict, f)
+
         return collisions, rewards_collected
 
     def env_reset(self):

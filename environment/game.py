@@ -5,6 +5,7 @@ from environment.environment import Environment
 import pygame, sys
 from rl_agent.state_translator import StateTranslator
 import datetime
+import numpy as np
 
 def initialize_env(config, board_size = (700, 700)):
 
@@ -96,7 +97,7 @@ def run_game(Env, board, screen, clock):
     collision_detected = False
     victory = False
 
-    state_trans = StateTranslator(Env, 4)
+    state_trans = StateTranslator(Env, 1)
     while collision_detected == False and victory == False:
         # Clock locks framerate and prevents stuttering
         clock.tick(100)
@@ -116,8 +117,9 @@ def run_game(Env, board, screen, clock):
         # before_step = datetime.datetime.now()
         player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
         state_trans.set_objects(player, enemies, rewards)
-        _, reward, _ = state_trans.state_translation(collision, rewards_collected)
-        #print(reward)
+        state_translated, reward, _ = state_trans.state_translation(collision, rewards_collected)
+        #print('state ', state_translated)
+        print('reward', reward)
 
         screen.blit(board, boardrect)
         screen.blit(player.player, player.get_position())
@@ -140,6 +142,18 @@ def run_game_with_agent(agent, Env, board, screen, clock):
 
     collision_detected = False
     victory = False
+    num_steps_per_move = agent.frames_per_step
+
+    # Create a state that is 4 frames to start as that is what we train with
+    action = 1
+    cur_state = np.array([])
+    for i in range(num_steps_per_move):
+        new_player, new_enemies, new_goods, \
+        collision_mini, goods_collected = Env.env_take_step(action)
+
+        agent.StateTrans.set_objects(new_player, new_enemies, new_goods)
+        new_state_mini, reward_mini, done_mini = agent.StateTrans.state_translation(collision_mini, goods_collected)
+        cur_state = np.append(cur_state, new_state_mini)
 
     while collision_detected == False and victory == False:
         # Clock locks framerate and prevents stuttering
@@ -149,29 +163,52 @@ def run_game_with_agent(agent, Env, board, screen, clock):
             if event.type == pygame.QUIT:
                 sys.exit()
 
-        player, enemies, goods = Env.return_cur_env()
+
+        # player, enemies, goods = Env.return_cur_env()
+        #
+        # #start = datetime.datetime.now()
+        # agent.StateTrans.set_objects(player, enemies, goods)
+        # cur_state = agent.StateTrans.get_state()
 
 
-        #start = datetime.datetime.now()
-        agent.StateTrans.set_objects(player, enemies, goods)
-        cur_state = agent.StateTrans.get_state()
-    
         #print(cur_state)
         #print('state trans:', datetime.datetime.now() - start)
-        move = agent.act(cur_state)
+
         #print('move', datetime.datetime.now() - start)
         """
         Return the player class, list of enemy classes, uncollected rewards,
         collision and rewards collected are boolean
         """
 
-        player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
 
-        screen.blit(board, boardrect)
-        screen.blit(player.player, player.get_position())
-        update_objects_ingame(screen, enemies, enemies = True)
-        update_objects_ingame(screen, rewards, enemies = False)
-        pygame.display.update()
+        # Make an action with our state
+        action = agent.act(cur_state)
+        # Create an empty state to popualate with our last action
+        cur_state = np.array([])
+        collision = False
+
+        # Perform action x amount of times as we train with... ie one state is 4 frames
+        for i in range(num_steps_per_move):
+            new_player, new_enemies, new_goods, \
+            collision_mini, goods_collected = Env.env_take_step(action)
+
+            agent.StateTrans.set_objects(new_player, new_enemies, new_goods)
+            new_state_mini, reward_mini, done_mini = agent.StateTrans.state_translation(collision_mini, goods_collected)
+            print(reward_mini)
+            cur_state = np.append(cur_state, new_state_mini)
+
+            if collision_mini:
+                collision = True
+
+            rewards = new_goods
+
+            screen.blit(board, boardrect)
+            screen.blit(new_player.player, new_player.get_position())
+            update_objects_ingame(screen, new_enemies, enemies = True)
+            update_objects_ingame(screen, new_goods, enemies = False)
+            pygame.display.update()
+
+
 
         if len(rewards) == 0:
             victory = True

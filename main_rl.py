@@ -5,14 +5,16 @@ from rl_agent.rl_agent import Agent
 import pygame
 import keras
 
+
 with open("game_config.json", "rb") as f:
     config = json.load(f)
 
 if __name__ == '__main__':
 
+
     screen, board, game_over, victory_screen, clock = create_static_images()
     Env = initialize_env(config)
-    model = keras.models.load_model('rl_agent/trial-40_model_100_replay_1000_retrain')
+    model = keras.models.load_model('rl_agent/trial-4_model_higher_penalty_transfer_learning_from_good_perf')
     print('model_loaded')
     Agent = Agent(Env,
                   model=model,
