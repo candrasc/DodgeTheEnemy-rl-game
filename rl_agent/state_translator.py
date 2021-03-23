@@ -24,7 +24,7 @@ class StateTranslator:
         self.board = np.zeros(env.board)
         self.n_obj = n_objects_in_state
         self.state_shape = (2*( 6*self.n_obj  + 2*self.n_obj) + # enemy and goods positions, sizes, velocities
-                            (4 + 2 + 1 + 1)) # player attributes (wall dists, position, size, step_size)
+                            (4  + 1)) # player attributes (wall dists, step_size)
         # Factors to divide state attributes by so they are less than 1
         self.size_scale = 100 # max object size
         self.position_scale = env.board[0] # max board dimension
@@ -109,18 +109,18 @@ class StateTranslator:
         (the sizes will be inputs into the NN so it will be figured out then)
         """
 
-        if len(obj_sizes)<=n_obj:
-            n_smallest_indicies = [i for i in range(len(obj_sizes))]
+        # if len(obj_sizes)<=n_obj:
+        #     n_smallest_indicies = [i for i in range(len(obj_sizes))]
+        #
+        # else:
+        distances = np.array([])
+        for i in range(len(obj_sizes)):
+            dist = self._calc_distance(player_pos, obj_poss[i])
+            dist_true = abs(dist - player_size - obj_sizes[i])
+            distances = np.append(distances, dist_true)
 
-        else:
-            distances = np.array([])
-            for i in range(len(obj_sizes)):
-                dist = self._calc_distance(player_pos, obj_poss[i])
-                dist_true = abs(dist - player_size - obj_sizes[i])
-                distances = np.append(distances, dist_true)
-
-            idx = np.argpartition(distances, n_obj)
-            n_smallest_indicies = idx[:n_obj]
+        idx = np.argpartition(distances, range(n_obj))
+        n_smallest_indicies = idx[:n_obj]
 
         return n_smallest_indicies
 
@@ -138,11 +138,11 @@ class StateTranslator:
         player_rad = player_size/2
         object_rad = object_size/2
 
-        p_x = position1[0]
-        p_y = position1[1]
+        p_x = position1[0] + player_rad
+        p_y = position1[1] + player_rad
 
-        e_x = position2[0]
-        e_y = position2[1]
+        e_x = position2[0] + object_rad
+        e_y = position2[1] + object_rad
 
         dx = max((abs(e_x - p_x) - (player_rad + object_rad))/self.position_scale, 0)
         dy = max((abs(e_y - p_y) - (player_rad + object_rad))/self.position_scale, 0)
@@ -151,7 +151,8 @@ class StateTranslator:
         if e_y>=p_y:
             pos_vec[0] = 1
         else:
-            pos_vec[1] = 0
+            pos_vec[1] = 1
+
         if e_x>=p_x:
             pos_vec[2] = 1
         else:
@@ -272,9 +273,9 @@ class StateTranslator:
         state = np.array([])
 
         state = np.append(state,
-                         [player_pos/self.position_scale,
-                          distances_to_walls/self.position_scale,
-                          player_size/self.size_scale,
+                         # [player_pos/self.position_scale,
+                         [distances_to_walls/self.position_scale,
+                          #player_size/self.size_scale,
                           player_step_size/self.velocity_scale
                           ])
 
