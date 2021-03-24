@@ -14,9 +14,10 @@ The RL agent has been able to succesfully win an easier version of the game you 
 
 ## Try it out yourself
 1) Clone the repo
-2) Edit the game config to have your desired params such as range of: enemy velocities, num enemies, enemy size (and the same for rewards to collect)
-3) Run "main_rl.py" from the console and you can watch the AI play the game!
-4) To restart the game in the same environment, double tap "space". To restart in a new random environment, double tap "q"
+2) Create a conda environment to run the game with: "conda create --name <env> --file requirements.txt"
+3) Edit the game config to have your desired params such as range of: enemy velocities, num enemies, enemy size (and the same for rewards to collect)
+4) Run "main_rl.py" from the console and you can watch the AI play the game!
+5) To restart the game in the same environment, double tap "space". To restart in a new random environment, double tap "q"
 
 If you want to play the game yourself, just run "main.py"
 
