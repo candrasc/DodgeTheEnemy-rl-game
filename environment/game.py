@@ -97,7 +97,7 @@ def run_game(Env, board, screen, clock):
     collision_detected = False
     victory = False
 
-    state_trans = StateTranslator(Env, 1)
+    state_trans = StateTranslator(Env, 2)
     while collision_detected == False and victory == False:
         # Clock locks framerate and prevents stuttering
         clock.tick(100)
@@ -118,8 +118,8 @@ def run_game(Env, board, screen, clock):
         player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
         state_trans.set_objects(player, enemies, rewards)
         state_translated, reward, _ = state_trans.state_translation(collision, rewards_collected)
-        #print('state ', state_translated)
-        print('reward', reward)
+        print('state ', state_translated)
+        #print('reward', reward)
 
         screen.blit(board, boardrect)
         screen.blit(player.player, player.get_position())

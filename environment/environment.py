@@ -204,13 +204,14 @@ class Environment:
                         if len(self.rewards)>0:
                             self.rewards.pop(i)
                         rewards_collected = True
-                    except:
-                        import pickle
-                        error_dict = {'rewards_positions': reward_positions,
-                                      'rewards_sizes':reward_sizes,
-                                      'iteration': i}
-                        with open('reward_error.pkl', 'wb') as f:
-                            pickle.dump(error_dict, f)
+                    except Exception as e:
+                        print(e)
+                        # import pickle
+                        # error_dict = {'rewards_positions': reward_positions,
+                        #               'rewards_sizes':reward_sizes,
+                        #               'iteration': i}
+                        # with open('reward_error.pkl', 'wb') as f:
+                        #     pickle.dump(error_dict, f)
 
         return collisions, rewards_collected
 

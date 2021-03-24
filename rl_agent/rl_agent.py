@@ -24,7 +24,7 @@ class Agent:
 
     def __init__(self, env, model=None, epsilon = 1.0, epsilon_min = 0.05, frames_per_step=4):
         self.env = env
-        self.StateTrans = StateTranslator(env, n_objects_in_state = 1)
+        self.StateTrans = StateTranslator(env, n_objects_in_state = 2)
         self.board = np.zeros(env.board)
         self.env     = env
         self.frames_per_step = frames_per_step
@@ -35,7 +35,7 @@ class Agent:
         self.epsilon = epsilon
         self.epsilon_min = epsilon_min
         self.epsilon_decay = 0.990
-        self.learning_rate = 0.005
+        self.learning_rate = 0.001
         self.tau = .125
 
         if model == None:
@@ -47,7 +47,8 @@ class Agent:
     def create_model(self):
         model   = Sequential()
 
-        model.add(Dense(48, input_dim=self.state_shape, activation="relu"))
+        model.add(Dense(80, input_dim=self.state_shape, activation="relu"))
+        model.add(Dense(48, activation="relu"))
         model.add(Dense(24, activation="relu"))
         model.add(Dense(12, activation="relu"))
         model.add(Dense(len(self.env.action_space)))
@@ -127,7 +128,7 @@ def main():
     #model = keras.models.load_model('good_performance_using_stable_rewards/trial-17_model_d_from_p_state')
 
     dqn_agent = Agent(env=env,
-                      model = model,
+                      #model = model,
                       epsilon = epsilon,
                       epsilon_min = min_epsilon)
 
@@ -183,11 +184,15 @@ def main():
                     done = True
 
             # Ensure rewards are consistent
-            if reward>0:
+            if reward>10:
                 reward = 100
+            # Make it slightly worse to die... staying alive is more important
+            # than collecting rewards
             elif reward<-4:
-                reward = -200
-            elif reward > -3 and reward <0:
+                reward = -150
+            # If in 4 frames, the agent dies and collects rewards, or doesn't
+            # collect anything we will not return any type of feedback
+            elif reward > -4 and reward <5:
                 reward = -1
 
 
@@ -231,7 +236,7 @@ def main():
 
                 if step % 100 == 0:
 
-                    dqn_agent.save_model("trial-{}_model_higher_penalty_transfer_learning_from_good_perf".format(trial))
+                    dqn_agent.save_model("trial-{}_model_2_object_detection_smart_vel".format(trial))
 
 
     dqn_agent.save_model("training_over.model")

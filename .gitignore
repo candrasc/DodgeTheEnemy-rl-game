@@ -2,5 +2,6 @@
 __pycache__/
 testing.ipynb
 *.ipynb_checkpoints
+*.docx
 
 objects\__pycache__\players.cpython-38.pyc

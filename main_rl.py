@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     screen, board, game_over, victory_screen, clock = create_static_images()
     Env = initialize_env(config)
-    model = keras.models.load_model('rl_agent/trial-4_model_higher_penalty_transfer_learning_from_good_perf')
+    model = keras.models.load_model('rl_agent/good_example_agent')
     print('model_loaded')
     Agent = Agent(Env,
                   model=model,
