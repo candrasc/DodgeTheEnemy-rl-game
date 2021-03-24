@@ -14,3 +14,8 @@ The RL agent can succesfully win the game, gifs and examples will be coming soon
 4) To restart the game in the same environment, double tap "space". To restart in a new random environment, double tap "q"
 
 If you want to play the game yourself, just run "main.py"
+
+
+### Below is the RL agent beating a simplified version of the game where all objects are the same size 
+
+![alt text](https://github.com/candrasc/rl_game_dodge_the_enemy/blob/main/read_me_images/ezgif-2-b3433a7c00d1.gif "RL Agent Victory")
