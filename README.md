@@ -1,7 +1,9 @@
 # rl_game_dodge_the_enemy
-I created a game with the purpose of teaching a reinforcement learning agent to play it. The core of the game is an environment that sets what is possible within its boundries and allows the objects within it to act in a certain way. I also created object classes which interact within the environment (Players, Enemeis, Rewards). Its mostly a lot of numpy and rendered with Pygame! 
+I created a game from scratch with the purpose of teaching a reinforcement learning agent to play it. The core of the game is the environment class that sets what is possible within its boundries and allows the objects within it to act in a certain way. I also created object classes which interact within the environment (Players, Enemeis, Rewards). Its mostly a lot of numpy and rendered with Pygame! 
 
-The RL agent has been able to succesfully win an easier version of the game you can see below on a consistent basis. In the near future, I will write an article about the methodology and "tricks" I used to get the agent to learn the game. 
+This game can be played by a player or an reinforcement learning agent. You can choose main.py to play yourself, and main_rl.py to watch an rl agent play.
+
+The RL agent has been able to succesfully win an easier version of the game you can see below. In the near future, I will write an article about the methodology and "tricks" I used to get the agent to learn the game. This agent is far from perfect and will be updated to more advanced algorithms such as actor-critic.
 
 ## Game Objectives:
 1) Collect all the rewards (multi-color bouncing squares)
