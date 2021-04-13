@@ -155,8 +155,11 @@ def run_game_with_agent(agent, Env, board, screen, clock):
         new_state_mini, reward_mini, done_mini = agent.StateTrans.state_translation(collision_mini, goods_collected)
         cur_state = np.append(cur_state, new_state_mini)
 
+    step_count = 0
     while collision_detected == False and victory == False:
         # Clock locks framerate and prevents stuttering
+        step_count += 1
+        print(step_count)
         clock.tick(50)
         screen.fill(black)
         for event in pygame.event.get():
@@ -194,7 +197,7 @@ def run_game_with_agent(agent, Env, board, screen, clock):
 
             agent.StateTrans.set_objects(new_player, new_enemies, new_goods)
             new_state_mini, reward_mini, done_mini = agent.StateTrans.state_translation(collision_mini, goods_collected)
-            print(reward_mini)
+            # print(reward_mini)
             cur_state = np.append(cur_state, new_state_mini)
 
             if collision_mini:

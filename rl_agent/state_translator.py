@@ -15,7 +15,8 @@ class StateTranslator:
         # Factors to divide state attributes by so they are less than 1
         self.size_scale = 100 # max object size
         self.position_scale = env.board[0] # max board dimension
-        self.velocity_scale = 10 # max velocity
+        self.velocity_scale = 5 # max velocity
+
 
     def _get_x_y_coord(self, position):
         """
@@ -327,14 +328,18 @@ class StateTranslator:
 
         if collision:
             Done = True
-            Reward = -150
+            Reward = -50
 
-        if hit_wall:
-            Done = True
-            Reward = -150
+        elif goods_collected:
+            Done = False
+            Reward = +50
 
-        if goods_collected:
+        elif hit_wall:
             Done = True
-            Reward = +100
+            Reward = -50
+
+        elif len(self.goods)==0:
+            Done = False
+            Reward = +50
 
         return state, Reward, Done

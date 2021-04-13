@@ -4,7 +4,10 @@ from environment.game import run_game, initialize_env, create_static_images, \
 
 import pygame
 
-with open("game_config.json", "rb") as f:
+# with open("game_config.json", "rb") as f:
+#     config = json.load(f)
+
+with open("testing_conf.json", "rb") as f:
     config = json.load(f)
 
 if __name__ == '__main__':

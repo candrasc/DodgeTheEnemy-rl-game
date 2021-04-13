@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, pickle
 sys.path.insert(0, os.path.abspath(".."))
 
 import numpy as np
@@ -10,6 +10,7 @@ from keras.optimizers import Adam
 
 from collections import deque
 from rl_agent.state_translator import StateTranslator
+from rl_agent.perf_viz import gen_report
 
 class Agent:
     """
@@ -34,7 +35,7 @@ class Agent:
         self.gamma = 0.95
         self.epsilon = epsilon
         self.epsilon_min = epsilon_min
-        self.epsilon_decay = 0.990
+        self.epsilon_decay = 0.950
         self.learning_rate = 0.001
         self.tau = .125
 
@@ -47,10 +48,12 @@ class Agent:
     def create_model(self):
         model   = Sequential()
 
-        model.add(Dense(80, input_dim=self.state_shape, activation="relu"))
-        model.add(Dense(48, activation="relu"))
-        model.add(Dense(24, activation="relu"))
-        model.add(Dense(12, activation="relu"))
+        model.add(Dense(200, input_dim=self.state_shape, activation="elu"))
+        # model.add(Dense(80, activation="elu"))
+        model.add(Dense(100, activation="elu"))
+        model.add(Dense(50, activation="elu"))
+        model.add(Dense(28, activation="elu"))
+        model.add(Dense(12, activation="elu"))
         model.add(Dense(len(self.env.action_space)))
         model.compile(loss="MSE",
             optimizer=Adam(lr=self.learning_rate))
@@ -117,34 +120,46 @@ def main():
 
     env = Environment((700,700))
 
-
     epsilon = .95
     min_epsilon = 0.05
     min_epsilon
 
-    trials  = 50
-    trial_len = 1000
+    trials  = 10000
+    trial_len = 500
+    pos_reward = 250
+    neg_reward = -200
+
+
     # Can load a previous model to speed up learning if you want
-    #model = keras.models.load_model('good_performance_using_stable_rewards/trial-17_model_d_from_p_state')
+    # model = keras.models.load_model('trial-2_200_reward')
 
     dqn_agent = Agent(env=env,
                       #model = model,
                       epsilon = epsilon,
                       epsilon_min = min_epsilon)
 
+    # This is for naming the folder
+    learning_rate = dqn_agent.learning_rate
+    num_hidden_layers = 3
+    num_obj_detected = dqn_agent.StateTrans.n_obj
+
     num_steps_per_move = dqn_agent.frames_per_step
     steps = []
+
+    # Record sum of reward per trial for plotting
+    results_dic = {}
     for trial in range(trials):
+        results_dic[trial] = 0
         print('trial', trial)
 
-        env.random_initialize(player_step_size_range = [4, 5],
+        env.random_initialize(player_step_size_range = [3, 4],
                              player_size_range = [30, 31],
-
-                             num_enemies_range = [5, 6],
-                             e_vel_range = [1, 4],
+                            # Let's see if it can learn to avoid one enemy and collect rewards
+                             num_enemies_range = [8, 9],
+                             e_vel_range = [1, 3],
                              enemy_size_range = [30, 31],
 
-                             num_rewards_range = [10, 11],
+                             num_rewards_range = [8, 9],
                              r_vel_range = [1,2],
                              reward_size_range = [30, 31]
                              )
@@ -163,7 +178,7 @@ def main():
 
         print('state_shape1', len(cur_state))
         for step in range(trial_len):
-            if step % 100 == 0:
+            if step % 50 == 0:
                 print('step: ', step)
 
             # Given an action, move 4 steps in that direction and record all vectors
@@ -184,18 +199,19 @@ def main():
                     done = True
 
             # Ensure rewards are consistent
-            if reward>10:
-                reward = 100
+            if reward>=5:
+                reward = pos_reward
+                print('reward collected')
             # Make it slightly worse to die... staying alive is more important
             # than collecting rewards
-            elif reward<-4:
-                reward = -150
+            elif reward<=-5:
+                reward = neg_reward
             # If in 4 frames, the agent dies and collects rewards, or doesn't
             # collect anything we will not return any type of feedback
-            elif reward > -4 and reward <5:
+            elif reward > -5 and reward <5:
                 reward = -1
 
-
+            results_dic[trial] += reward
             dqn_agent.remember(cur_state, action, reward, new_state, done)
 
             cur_state = new_state
@@ -206,40 +222,17 @@ def main():
                 dqn_agent.target_train()
 
             if done:
-                print('done', reward)
+                if trial%50 == 0:
+                    print('done', reward)
+                    direct = f"{learning_rate}_LR-{num_hidden_layers}_HL-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
+                    dqn_agent.save_model(direct + f"/trial-{trial}_200_reward")
+                    with open(direct + "/results_dic.pkl", 'wb') as f:
+                        pickle.dump(results_dic, f)
+                if trial%100 == 0:
+                    gen_report(direct)
 
-                env.random_initialize(player_step_size_range = [4, 5],
-                                     player_size_range = [30, 31],
-                                    # Let's see if it can learn to avoid one enemy and collect rewards
-                                     num_enemies_range = [5, 6],
-                                     e_vel_range = [1, 4],
-                                     enemy_size_range = [30, 31],
+                break
 
-                                     num_rewards_range = [10, 11],
-                                     r_vel_range = [1,2],
-                                     reward_size_range = [30, 31]
-                                     )
-
-                player, enemies, goods = env.return_cur_env()
-
-                # Random restart the env after completion
-                cur_state = np.array([])
-                action_start = np.random.randint(0, 4)
-                for i in range(num_steps_per_move):
-
-                    dqn_agent.StateTrans.set_objects(player, enemies, goods)
-                    cur_state_mini = dqn_agent.StateTrans.get_state()
-                    cur_state = np.append(cur_state, cur_state_mini)
-
-            # Every 100 steps we save our model progress
-            if step >= 100:
-
-                if step % 100 == 0:
-
-                    dqn_agent.save_model("trial-{}_model_2_object_detection_smart_vel".format(trial))
-
-
-    dqn_agent.save_model("training_over.model")
 
 if __name__ == "__main__":
     main()
