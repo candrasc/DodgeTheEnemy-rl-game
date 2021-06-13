@@ -1,5 +1,5 @@
 import json
-from environment.game import run_game, run_game_with_agent, initialize_env, create_static_images, \
+from game.environment.game_runner import run_game, run_game_with_agent, initialize_env, create_static_images, \
                  play_victory_screen, play_game_over_screen, restart_game
 from rl_agent.rl_agent import Agent
 import pygame

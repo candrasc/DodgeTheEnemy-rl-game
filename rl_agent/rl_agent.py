@@ -104,7 +104,7 @@ class Agent:
 
 
 
-from environment.environment import Environment
+from game.environment.environment import Environment
 
 def main():
     """
@@ -118,7 +118,7 @@ def main():
     Instead the trial will continue, but the environment will random reset
     """
 
-    env = Environment((700,700))
+    env = Environment((700, 700))
 
     epsilon = .95
     min_epsilon = 0.05
@@ -127,7 +127,7 @@ def main():
     trials  = 10000
     trial_len = 500
     pos_reward = 250
-    neg_reward = -200
+    neg_reward = -300
 
 
     # Can load a previous model to speed up learning if you want
