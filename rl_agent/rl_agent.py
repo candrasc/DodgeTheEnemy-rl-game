@@ -47,14 +47,13 @@ class Agent:
 
     def create_model(self):
         model   = Sequential()
-
-        model.add(Dense(200, input_dim=self.state_shape, activation="elu"))
-        # model.add(Dense(80, activation="elu"))
-        model.add(Dense(100, activation="elu"))
-        model.add(Dense(50, activation="elu"))
-        model.add(Dense(28, activation="elu"))
-        model.add(Dense(12, activation="elu"))
-        model.add(Dense(len(self.env.action_space)))
+        model.add(Dense(2000, input_dim=self.state_shape, activation="relu"))
+        model.add(Dense(1000, activation="relu"))
+        model.add(Dense(500, activation="relu"))
+        model.add(Dense(1000, activation="relu"))
+        model.add(Dense(500, activation="relu"))
+        model.add(Dense(100, activation="relu"))
+        model.add(Dense(4))
         model.compile(loss="MSE",
             optimizer=Adam(lr=self.learning_rate))
         return model
@@ -74,7 +73,7 @@ class Agent:
         self.memory.append([state, action, reward, new_state, done])
 
     def replay(self):
-        batch_size = 32
+        batch_size = 256
         if len(self.memory) < batch_size:
             return
 
@@ -82,15 +81,36 @@ class Agent:
         ########################
         # This can be sped up significantly, but processing all samples in batch rather than 1 at a time
         ####################
+        states = np.array([])
+        actions = np.array([])
+        rewards = []
+        dones = []
+        new_states = np.array([])
+
         for sample in samples:
             state, action, reward, new_state, done = sample
-            target = self.target_model.predict(state.reshape(-1, self.state_shape))
-            if done:
-                target[0][action] = reward
+
+            states = np.append(states, state)
+            actions = np.append(actions, action)
+            rewards.append(reward)
+            new_states = np.append(new_states, new_state)
+            dones.append(done)
+
+        new_states = new_states.reshape(batch_size, self.state_shape)
+        targets = self.target_model.predict(states.reshape(batch_size, self.state_shape))
+        targets = targets.reshape(batch_size, 4)
+        for i in range(batch_size):
+            if dones[i]:
+                targets[i][int(actions[i])] = rewards[i]
+
             else:
-                Q_future = max(self.target_model.predict(new_state.reshape(-1, self.state_shape))[0])
-                target[0][action] = reward + Q_future * self.gamma
-            self.model.fit(state.reshape(-1, self.state_shape), target, epochs=1, verbose=0)
+                Q_future = max(self.target_model.predict(new_states[i].reshape(-1, self.state_shape))[0])
+                #                 print('targets i', targets[i])
+                #                 print('actions[i]', actions[i])
+                targets[i][int(actions[i])] = rewards[i] + Q_future * self.gamma
+
+        self.model.fit(states.reshape(batch_size, self.state_shape), targets,
+                       epochs=1, verbose=0)
 
     def target_train(self):
         weights = self.model.get_weights()
@@ -122,16 +142,15 @@ def main():
 
     epsilon = .95
     min_epsilon = 0.05
-    min_epsilon
 
     trials  = 10000
     trial_len = 500
-    pos_reward = 250
-    neg_reward = -200
+    pos_reward = 200
+    neg_reward = -250
 
 
     # Can load a previous model to speed up learning if you want
-    # model = keras.models.load_model('trial-2_200_reward')
+   # model = keras.models.load_model('April21-0.001_LR-3_HL-2_obj_det-250r_-200p/trial-350_200_reward')
 
     dqn_agent = Agent(env=env,
                       #model = model,
@@ -224,8 +243,8 @@ def main():
             if done:
                 if trial%50 == 0:
                     print('done', reward)
-                    direct = f"{learning_rate}_LR-{num_hidden_layers}_HL-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
-                    dqn_agent.save_model(direct + f"/trial-{trial}_200_reward")
+                    direct = f"April21-{learning_rate}_LR-{num_hidden_layers}_HL-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
+                    dqn_agent.save_model(direct + f"/trial-{trial+350}_200_reward")
                     with open(direct + "/results_dic.pkl", 'wb') as f:
                         pickle.dump(results_dic, f)
                 if trial%100 == 0:

@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     screen, board, game_over, victory_screen, clock = create_static_images()
     Env = initialize_env(config)
-    model = keras.models.load_model('rl_agent/good_example_agent')
+    model = keras.models.load_model('rl_agent/April21-0.001_LR-3_HL-2_obj_det-200r_-250p/trial-1000_200_reward')
     print('model_loaded')
     Agent = Agent(Env,
                   model=model,
