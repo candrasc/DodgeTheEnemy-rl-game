@@ -1,8 +1,7 @@
 import json
-from game.environment.game_runner import run_game, run_game_with_agent, initialize_env, create_static_images, \
+from rl_game.game.environment.game_runner import run_game_with_agent, initialize_env, create_static_images, \
                  play_victory_screen, play_game_over_screen, restart_game
-from rl_agent.rl_agent import Agent
-import pygame
+from rl_game.rl_agent.rl_agent import Agent
 import keras
 
 
@@ -11,15 +10,14 @@ with open("game_config.json", "rb") as f:
 
 if __name__ == '__main__':
 
-
     screen, board, game_over, victory_screen, clock = create_static_images()
     Env = initialize_env(config)
-    model = keras.models.load_model('rl_agent/April21-0.001_LR-3_HL-2_obj_det-200r_-250p/trial-1000_200_reward')
+    model = keras.models.load_model('rl_game/rl_agent/July5-0.001_LR-_HL-2_obj_det-200r_-100p/trial-800')
     print('model_loaded')
     Agent = Agent(Env,
                   model=model,
-                  epsilon = 0,
-                  epsilon_min = 0)
+                  epsilon=0,
+                  epsilon_min=0)
 
     while True:
         victory, collision = run_game_with_agent(Agent, Env, board, screen, clock)

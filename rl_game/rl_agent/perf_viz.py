@@ -10,9 +10,8 @@ import pandas as pd
 
 def gen_report(directory):
 
-    directory = directory
-    filename = "results_dic.pkl"
-    file_path = os.sep.join([directory, filename])
+    filename = "/results_dic.pkl"
+    file_path = directory + filename
 
     with open(file_path, 'rb') as f:
         results = pickle.load(f)
@@ -31,7 +30,7 @@ def gen_report(directory):
     plt.plot(df['rolling_10'], label = '10 trial rolling ave', color = 'blue', linewidth = 3)
     plt.plot(df['rolling_20'], label = '20 trial rolling ave', color = 'red', linewidth = 3)
     plt.plot(df['rolling_50'], label = '50 trial rolling ave', color = 'green', linewidth = 3)
-    plt.title("Agent Reward Per Trial: 200 Reward, 250 Penalty")
+    plt.title("Agent Reward Per Trial")
     plt.xlabel('Trial')
     plt.ylabel('Total Reward')
     plt.legend()

@@ -155,3 +155,9 @@ yarl=1.6.3=py38h2bbff1b_0
 zeromq=4.3.3=ha925a31_3
 zipp=3.4.0=pyhd3eb1b0_0
 zlib=1.2.11=h62dcd97_4
+
+numpy~=1.19.2
+seaborn~=0.11.1
+matplotlib~=3.4.1
+pandas~=1.2.3
+keras~=2.4.3

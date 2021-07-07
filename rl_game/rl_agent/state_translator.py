@@ -6,11 +6,11 @@ class StateTranslator:
     vector that can be passed to the RL agent
     """
 
-    def __init__(self, env, n_objects_in_state = 4):
+    def __init__(self, env, n_objects_in_state=2):
         self.env = env
         self.board = np.zeros(env.board)
         self.n_obj = n_objects_in_state
-        self.state_shape = (2*( 6*self.n_obj  + 6*self.n_obj) + # enemy and goods positions, velocities
+        self.state_shape = (2*( 6*self.n_obj + 6*self.n_obj) + # enemy and goods positions, velocities
                             (4  + 1)) # player attributes (wall dists, step_size)
         # Factors to divide state attributes by so they are less than 1
         self.size_scale = 100 # max object size
@@ -335,6 +335,7 @@ class StateTranslator:
             Reward = +50
 
         elif hit_wall:
+            print('hitwall')
             Done = True
             Reward = -50
 

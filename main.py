@@ -1,13 +1,11 @@
 import json
-from game.environment.game_runner import run_game, initialize_env, create_static_images, \
+from rl_game.game.environment.game_runner import run_game, initialize_env, create_static_images, \
                  play_victory_screen, play_game_over_screen, restart_game
-
-import pygame
 
 # with open("game_config.json", "rb") as f:
 #     config = json.load(f)
 
-with open("game_config.json", "rb") as f:
+with open("testing_conf.json", "rb") as f:
     config = json.load(f)
 
 if __name__ == '__main__':

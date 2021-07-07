@@ -1,6 +1,8 @@
-from game.objects.position import PositionSetter
-from game.objects.players import Player, Enemy, Reward
-from rl_agent.state_translator import StateTranslator
+from typing import Tuple
+
+from rl_game.game.objects.position_utils import PositionSetter
+from rl_game.game.objects.player import Player
+from rl_game.game.objects.secondary_objects import Enemy, Reward
 import numpy as np
 import random
 
@@ -39,13 +41,13 @@ class Environment:
         step = self.player.step_size
 
         if direction==0:
-            position.set_width(-step)
+            position.set_x_coord(-step)
         if direction==1:
-            position.set_height(-step)
+            position.set_y_coord(-step)
         if direction==2:
-            position.set_width(step)
+            position.set_x_coord(step)
         if direction==3:
-            position.set_height(step)
+            position.set_y_coord(step)
 
 
         new_pos = position.get_position()
@@ -75,8 +77,8 @@ class Environment:
         position.set_object(enemy_size,
                             enemy_position)
 
-        position.set_width(x)
-        position.set_height(y)
+        position.set_x_coord(x)
+        position.set_y_coord(y)
 
         cur_pos = position.get_position()
 
@@ -116,8 +118,8 @@ class Environment:
         position.set_object(reward_size,
                             reward_position)
 
-        position.set_width(x)
-        position.set_height(y)
+        position.set_x_coord(x)
+        position.set_y_coord(y)
 
         cur_pos = position.get_position()
 
@@ -136,7 +138,6 @@ class Environment:
         [reward.get_position() for reward in updated_rewards]
         return updated_rewards
 ################################
-
 
     def env_take_step(self, player_move):
         """
@@ -161,7 +162,7 @@ class Environment:
     def return_cur_env(self):
         return self.player, self.enemies, self.rewards
 
-    def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size):
+    def _contact_made(self, player_pos, enemy_pos, player_size, enemy_size) -> bool:
         # print(player_size)
         player_rad = player_size/2
         enemy_rad = enemy_size/2
@@ -176,7 +177,7 @@ class Environment:
         else:
             return False
 
-    def check_collisions(self):
+    def check_collisions(self) -> Tuple[bool]:
 
         player_pos = self.player.get_position()
         player_size = self.player.size
@@ -195,8 +196,6 @@ class Environment:
         if len(self.rewards)>0:
             reward_positions, reward_sizes = zip(*((reward.get_position(), reward.size)
                                                     for reward in self.rewards))
-
-
 
             for i in range(len(self.rewards)):
                 if self._contact_made(player_pos, reward_positions[i], player_size, reward_sizes[i]) == True:
@@ -275,15 +274,13 @@ class Environment:
             e_pos_y = random.choice(list(set(range(pos_range[0], pos_range[1]))-set(avoid_squares_y)))
 
             enemy = Enemy(size = _rand_int(enemy_size_range[0],
-                                                       enemy_size_range[1]),
-
-
+                                           enemy_size_range[1]),
 
                           starting_pos = (e_pos_x,
                                           e_pos_y),
 
                           velocity = (_rand_int(e_vel_range[0],
-                                               e_vel_range[1]),
+                                                e_vel_range[1]),
                                       _rand_int(e_vel_range[0],
                                                 e_vel_range[1])))
             self.add_enemy(enemy)

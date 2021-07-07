@@ -1,10 +1,9 @@
 """
 This file stores the main functions that our main.py will use to run the game
 """
-from game.environment.environment import Environment
+from rl_game.game.environment.environment import Environment
 import pygame, sys
-from rl_agent.state_translator import StateTranslator
-import datetime
+from rl_game.rl_agent.state_translator import StateTranslator
 import numpy as np
 
 def initialize_env(config, board_size = (700, 700)):
@@ -46,19 +45,20 @@ def create_static_images(board_size = (700, 700)):
     screen = pygame.display.set_mode(size)
     black = (0,0,0)
 
-    board = pygame.image.load('game/images/board.jpg').convert()
+    board = pygame.image.load('rl_game/game/environment/images/board.jpg').convert()
     board = pygame.transform.scale(board, size)
     boardrect = board.get_rect()
 
-    game_over = pygame.image.load('game/images/you_lose.jpg').convert()
+    game_over = pygame.image.load('rl_game/game/environment/images/you_lose.jpg').convert()
     game_over = pygame.transform.scale(game_over, (600,600))
 
-    victory_screen = pygame.image.load('game/images/victory.jpg').convert()
+    victory_screen = pygame.image.load('rl_game/game/environment/images/victory.jpg').convert()
     victory_screen = pygame.transform.scale(victory_screen, (600, 600))
 
     clock = pygame.time.Clock()
 
     return screen, board, game_over, victory_screen, clock
+
 
 def update_objects_ingame(screen, objects, enemies = True):
     """
@@ -145,7 +145,7 @@ def run_game_with_agent(agent, Env, board, screen, clock):
         # Clock locks framerate and prevents stuttering
         step_count += 1
         print(step_count)
-        clock.tick(50)
+
         screen.fill(black)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -177,6 +177,7 @@ def run_game_with_agent(agent, Env, board, screen, clock):
 
         # Perform action x amount of times as we train with... ie one state is 4 frames
         for i in range(num_steps_per_move):
+            clock.tick(200)
             new_player, new_enemies, new_goods, \
             collision_mini, goods_collected = Env.env_take_step(action)
 
