@@ -19,7 +19,7 @@ class Agent:
 
     """
 
-    def __init__(self, env, model=None, epsilon=1.0, epsilon_min=0.10, frames_per_step=8):
+    def __init__(self, env, model=None, epsilon=1.0, epsilon_min=0.10, frames_per_step=4):
         self.env = env
         self.StateTrans = StateTranslator(env, n_objects_in_state=2)
         self.board = np.zeros(env.board)
@@ -42,10 +42,7 @@ class Agent:
 
     def create_model(self):
         model = Sequential()
-        model.add(Dense(200, input_dim=self.state_shape, activation="relu"))
-        model.add(Dense(100, activation="relu"))
-        model.add(Dense(200, activation="relu"))
-        model.add(Dense(50, activation="relu"))
+        model.add(Dense(50, input_dim=self.state_shape, activation="relu"))
         model.add(Dense(4))
         model.compile(loss="MSE",
                       optimizer=Adam(lr=self.learning_rate))

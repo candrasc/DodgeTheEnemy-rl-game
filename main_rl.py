@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     screen, board, game_over, victory_screen, clock = create_static_images()
     Env = initialize_env(config)
-    model = keras.models.load_model('rl_game/rl_agent/July5-0.001_LR-_HL-2_obj_det-200r_-100p/trial-800')
+    model = keras.models.load_model('rl_game/rl_agent/July7-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-500')
     print('model_loaded')
     Agent = Agent(Env,
                   model=model,

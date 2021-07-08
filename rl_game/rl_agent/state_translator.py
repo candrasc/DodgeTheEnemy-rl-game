@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class StateTranslator:
     """
     Used to translate the environment's object positions, sizes, speeds etc into a fixed size
@@ -10,13 +11,14 @@ class StateTranslator:
         self.env = env
         self.board = np.zeros(env.board)
         self.n_obj = n_objects_in_state
-        self.state_shape = (2*( 6*self.n_obj + 6*self.n_obj) + # enemy and goods positions, velocities
-                            (4  + 1)) # player attributes (wall dists, step_size)
+        self.goods_in_game = len(env.rewards)
+        self.state_shape = (2 * (6 * self.n_obj + 6 * self.n_obj) +  # enemy and goods positions, velocities
+                            (4 + 1)# player attributes (wall dists, step_size)
+                            + 1)  #num enemies remaining
         # Factors to divide state attributes by so they are less than 1
-        self.size_scale = 100 # max object size
-        self.position_scale = env.board[0] # max board dimension
-        self.velocity_scale = 5 # max velocity
-
+        self.size_scale = 100  # max object size
+        self.position_scale = env.board[0]  # max board dimension
+        self.velocity_scale = 5  # max velocity
 
     def _get_x_y_coord(self, position):
         """
@@ -44,12 +46,12 @@ class StateTranslator:
 
         vel_vec = np.zeros(6)
 
-        if x_vel>=1:
+        if x_vel >= 1:
             vel_vec[0] = 1
         else:
             vel_vec[1] = 1
 
-        if y_vel>=1:
+        if y_vel >= 1:
             vel_vec[2] = 1
 
         else:
@@ -68,24 +70,24 @@ class StateTranslator:
 
         if len(self.enemies) > 0:
             enemy_positions, enemy_sizes, enemy_velocities = zip(*((enemy.get_position(),
-                                                                   enemy.size,
-                                                                   enemy.get_velocity())
+                                                                    enemy.size,
+                                                                    enemy.get_velocity())
                                                                    for enemy in self.enemies))
 
             enemy_velocities = [self.__translate_velocities(vel) for vel in enemy_velocities]
 
         else:
-            enemy_positions, enemy_sizes, enemy_velocities = [0],[0],[0]
+            enemy_positions, enemy_sizes, enemy_velocities = [0], [0], [0]
 
-        if len(self.goods)>0:
+        if len(self.goods) > 0:
             good_positions, good_sizes, good_velocities = zip(*((good.get_position(),
                                                                  good.size,
                                                                  good.get_velocity())
-                                                                 for good in self.goods))
+                                                                for good in self.goods))
 
             good_velocities = [self.__translate_velocities(vel) for vel in good_velocities]
         else:
-            good_positions, good_sizes, good_velocities = [0],[0],[0]
+            good_positions, good_sizes, good_velocities = [0], [0], [0]
 
         enemy_positions = np.array(enemy_positions)
         enemy_sizes = np.array(enemy_sizes)
@@ -156,8 +158,8 @@ class StateTranslator:
         player_size = self.player.size
         object_size = object.size
 
-        player_rad = player_size/2
-        object_rad = object_size/2
+        player_rad = player_size / 2
+        object_rad = object_size / 2
 
         p_x = position1[0] + player_rad
         p_y = position1[1] + player_rad
@@ -165,16 +167,16 @@ class StateTranslator:
         e_x = position2[0] + object_rad
         e_y = position2[1] + object_rad
 
-        dx = max((abs(e_x - p_x) - (player_rad + object_rad))/self.position_scale, 0)
-        dy = max((abs(e_y - p_y) - (player_rad + object_rad))/self.position_scale, 0)
+        dx = max((abs(e_x - p_x) - (player_rad + object_rad)) / self.position_scale, 0)
+        dy = max((abs(e_y - p_y) - (player_rad + object_rad)) / self.position_scale, 0)
 
         pos_vec = np.zeros(4)
-        if e_y>=p_y:
+        if e_y >= p_y:
             pos_vec[0] = 1
         else:
             pos_vec[1] = 1
 
-        if e_x>=p_x:
+        if e_x >= p_x:
             pos_vec[2] = 1
         else:
             pos_vec[3] = 1
@@ -199,9 +201,9 @@ class StateTranslator:
 
         distance_array = np.array([d_x1, d_x2, d_y1, d_y2])
 
-        if len(distance_array[distance_array<=0]):
-            #print(distance_array)
-            #print(np.argwhere(distance_array<=0).flatten())
+        if len(distance_array[distance_array <= 0]):
+            # print(distance_array)
+            # print(np.argwhere(distance_array<=0).flatten())
             hit_wall = True
 
         return distance_array, hit_wall
@@ -231,12 +233,12 @@ class StateTranslator:
 
         distances_to_walls, _ = self._get_distance_to_walls()
 
-        if n_obj_enemies>0:
+        if n_obj_enemies > 0:
             n_smallest_enemy_indicies = self._get_n_closest_objects(player_pos,
-                                                                   player_size,
-                                                                   enemy_positions,
-                                                                   enemy_sizes,
-                                                                   n_obj_enemies)
+                                                                    player_size,
+                                                                    enemy_positions,
+                                                                    enemy_sizes,
+                                                                    n_obj_enemies)
 
             close_enemies = self.enemies[n_smallest_enemy_indicies]
 
@@ -253,7 +255,7 @@ class StateTranslator:
             #                        self.n_obj)
             #
             ev = self.__fill_end_of_array(enemy_velocities[n_smallest_enemy_indicies].flatten(),
-                                   self.n_obj * 6)
+                                          self.n_obj * 6)
 
         else:
             # ep = np.zeros(self.n_obj * 2)
@@ -261,12 +263,12 @@ class StateTranslator:
             enemy_distances = np.zeros(self.n_obj * 6)
             ev = np.zeros(self.n_obj * 6)
 
-        if n_obj_goods>0:
+        if n_obj_goods > 0:
             n_smallest_good_indicies = self._get_n_closest_objects(player_pos,
-                                                                    player_size,
-                                                                    good_positions,
-                                                                    good_sizes,
-                                                                    n_obj_goods)
+                                                                   player_size,
+                                                                   good_positions,
+                                                                   good_sizes,
+                                                                   n_obj_goods)
             close_goods = self.goods[n_smallest_good_indicies]
             goods_distances = np.array([])
             for g in close_goods:
@@ -282,7 +284,7 @@ class StateTranslator:
             #                        self.n_obj)
 
             gv = self.__fill_end_of_array(good_velocities[n_smallest_good_indicies].flatten(),
-                                   self.n_obj * 6)
+                                          self.n_obj * 6)
 
         else:
             # gp = np.zeros(self.n_obj * 2)
@@ -290,31 +292,25 @@ class StateTranslator:
             goods_distances = np.zeros(self.n_obj * 6)
             gv = np.zeros(self.n_obj * 6)
 
-
         state = np.array([])
 
-        state = np.append(state,
-                         # [player_pos/self.position_scale,
-                         [distances_to_walls/self.position_scale,
-                          #player_size/self.size_scale,
-                          player_step_size/self.velocity_scale
-                          ])
+        state = np.append(state, n_obj_goods/self.goods_in_game)
 
         state = np.append(state,
-                         # [ep/self.position_scale,
-                         #  es/self.size_scale,
+                          [distances_to_walls / self.position_scale,
+                           player_step_size / self.velocity_scale
+                           ])
+
+        state = np.append(state,
                           [enemy_distances,
-                          ev/self.velocity_scale])
+                           ev / self.velocity_scale])
 
         state = np.append(state,
-                         # [gp/self.position_scale,
-                         #  gs/self.size_scale,
                           [goods_distances,
-                          gv/self.velocity_scale])
+                           gv / self.velocity_scale])
 
         state = np.hstack(state)
         return state.flatten()
-
 
     def state_translation(self, collision, goods_collected):
         """Used to translate state into format similar to OpenAi gym
@@ -336,11 +332,11 @@ class StateTranslator:
 
         elif hit_wall:
             print('hitwall')
-            Done = True
+            Done = False
             Reward = -50
 
-        elif len(self.goods)==0:
-            Done = False
-            Reward = +50
+        elif len(self.goods) == 0:
+            Done = True
+            Reward = +10 ** 6
 
         return state, Reward, Done

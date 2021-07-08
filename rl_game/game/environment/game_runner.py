@@ -6,6 +6,7 @@ import pygame, sys
 from rl_game.rl_agent.state_translator import StateTranslator
 import numpy as np
 
+
 def initialize_env(config, board_size = (700, 700)):
 
     p_con = config['player_configs']
@@ -60,7 +61,7 @@ def create_static_images(board_size = (700, 700)):
     return screen, board, game_over, victory_screen, clock
 
 
-def update_objects_ingame(screen, objects, enemies = True):
+def update_objects_ingame(screen, objects, enemies=True):
     """
     Need to refactor the enemy and reward class to have their display object
     use the same attribute name... can then pass either to this function
@@ -74,6 +75,7 @@ def update_objects_ingame(screen, objects, enemies = True):
         positions = [i.get_position() for i in objects]
         for i in objects:
             screen.blit(i.reward, i.get_position())
+
 
 def run_game(Env, board, screen, clock):
     black = (0,0,0)
@@ -151,18 +153,6 @@ def run_game_with_agent(agent, Env, board, screen, clock):
             if event.type == pygame.QUIT:
                 sys.exit()
 
-
-        # player, enemies, goods = Env.return_cur_env()
-        #
-        # #start = datetime.datetime.now()
-        # agent.StateTrans.set_objects(player, enemies, goods)
-        # cur_state = agent.StateTrans.get_state()
-
-
-        #print(cur_state)
-        #print('state trans:', datetime.datetime.now() - start)
-
-        #print('move', datetime.datetime.now() - start)
         """
         Return the player class, list of enemy classes, uncollected rewards,
         collision and rewards collected are boolean
@@ -177,7 +167,7 @@ def run_game_with_agent(agent, Env, board, screen, clock):
 
         # Perform action x amount of times as we train with... ie one state is 4 frames
         for i in range(num_steps_per_move):
-            clock.tick(200)
+            clock.tick(400)
             new_player, new_enemies, new_goods, \
             collision_mini, goods_collected = Env.env_take_step(action)
 
@@ -207,6 +197,7 @@ def run_game_with_agent(agent, Env, board, screen, clock):
             collision_detected = True
             return victory, collision_detected
 
+
 def restart_game():
     wait = True
     while wait:
@@ -224,6 +215,7 @@ def restart_game():
             wait = False
 
     return reset_same, reset_random
+
 
 def play_victory_screen(screen, victory_screen, victory):
     black = (0,0,0)

@@ -1,6 +1,6 @@
 import json
 from rl_game.game.environment.game_runner import run_game, initialize_env, create_static_images, \
-                 play_victory_screen, play_game_over_screen, restart_game
+                                                 play_victory_screen, play_game_over_screen, restart_game
 
 # with open("game_config.json", "rb") as f:
 #     config = json.load(f)
