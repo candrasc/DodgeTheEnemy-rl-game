@@ -5,7 +5,7 @@
 2) Dodge the enemies (red bouncing squares)
 
 ## See it in action! ##
-### Below is the RL agent beating a simplified version of the game where all objects are the same size 
+### Below is the RL agent beating the game
 
 ![alt text](https://github.com/candrasc/rl_game_dodge_the_enemy/blob/main/read_me_images/ezgif-2-b3433a7c00d1.gif "RL Agent Victory")
 
