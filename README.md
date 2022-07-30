@@ -13,7 +13,7 @@ I created a game from scratch with the purpose of teaching a reinforcement learn
 
 This game can be played by a player or a reinforcement learning agent. You can run main.py to play yourself, and main_rl.py to watch an rl agent play. Double tap "spacebar" to play the exact some environment that you just died on (or won), and double tap "q" to randomly create a new environment within the bounds you specified in the config.json.
 
-The RL agent has been able to succesfully win an easier version of the game you can see below. In the near future, I will write an article about the methodology and "tricks" I used to get the agent to learn the game. This agent is far from perfect and will be updated to more advanced algorithms such as actor-critic.
+The RL agent has been able to succesfully and consistently beat the game. In the near future, I will write an article about the methodology and "tricks" I used to get the agent to learn the game. This agent is far from perfect and will be updated to more advanced algorithms such as actor-critic.
 
 A lot of the work getting the RL agent to work is found in the StateTranslator class. This takes the positions returned by the environment at each step, and transforms them into rich features for the agent to learn at a much faster rate. 
 
