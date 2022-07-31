@@ -42,13 +42,11 @@ def initialize_env(config, board_size = (700, 700)):
 
 def create_static_images(board_size = (700, 700)):
 
-    board_size = size = width, height = 700, 700
+    size = 700, 700
     screen = pygame.display.set_mode(size)
-    black = (0,0,0)
 
     board = pygame.image.load('rl_game/game/environment/images/board.jpg').convert()
     board = pygame.transform.scale(board, size)
-    boardrect = board.get_rect()
 
     game_over = pygame.image.load('rl_game/game/environment/images/you_lose.jpg').convert()
     game_over = pygame.transform.scale(game_over, (600,600))
@@ -68,11 +66,10 @@ def update_objects_ingame(screen, objects, enemies=True):
     and don't need the enemies=True param
     """
     if enemies:
-        positions = [i.get_position() for i in objects]
+        
         for i in objects:
             screen.blit(i.enemy, i.get_position())
     if not enemies:
-        positions = [i.get_position() for i in objects]
         for i in objects:
             screen.blit(i.reward, i.get_position())
 

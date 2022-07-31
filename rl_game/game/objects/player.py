@@ -1,6 +1,6 @@
 import pygame
 import copy
-import os, inspect
+import os
 
 from typing import Tuple
 
@@ -11,12 +11,10 @@ class Player:
 
     def __init__(self, player_number=1, player_size=30, step_size=0.3, position=(1,1)):
 
-        player_path = os.sep.join([current_directory, 'object_images/player_one.png '])
-        try:
-            self.player = pygame.image.load(player_path).convert()
-            self.player = pygame.transform.scale(self.player,(player_size, player_size))
-        except:
-            pass
+        player_path = os.path.join(current_directory, 'object_images/player_one.png ')
+
+        player = pygame.image.load(player_path).convert()
+        self.player = pygame.transform.scale(player, (player_size, player_size))
 
         self.player_number = player_number
         self.size = player_size
@@ -24,7 +22,7 @@ class Player:
 
         self.position = position
 
-    def get_move(self, key_input)-> int:
+    def get_move(self, key_input: int)-> int:
 
         if key_input[pygame.K_LEFT]:
             return 0
@@ -42,6 +40,8 @@ class Player:
         return self.position
 
     def copy(self):
+        '''Allow us to create an independent copy with no references to original
+        '''
         copyobj = Player()
         for name, attr in self.__dict__.items():
             if hasattr(attr, 'copy') and callable(getattr(attr, 'copy')):

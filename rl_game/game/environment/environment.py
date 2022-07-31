@@ -36,7 +36,7 @@ class Environment:
     def get_player(self) -> Player:
         return self.player
 
-    def move_player(self, direction: int):
+    def move_player(self, direction: int) -> Player:
         """ Translates an int from 1 to 3 into a direction to move and updates player position
 
         Args:
@@ -70,7 +70,7 @@ class Environment:
     ################################
     # This block of code can be refactored as it is going to be almost exactly
     # The same as for rewards
-    def add_enemy(self, enemy: Enemy):
+    def add_enemy(self, enemy: Enemy) -> None:
         """ Add enemy to environment and record initial state
 
         Args:
@@ -82,7 +82,7 @@ class Environment:
         self.enemies.append(enemy)
         self.initial_enemies.append(enemy.copy())
 
-    def add_enemies(self, enemies: List[Enemy]):
+    def add_enemies(self, enemies: List[Enemy]) -> None:
         """ add many enemies
 
         Args:
@@ -94,7 +94,7 @@ class Environment:
         for i in enemies:
             self.add_enemy(i)
 
-    def move_enemy(self, enemy: Enemy):
+    def move_enemy(self, enemy: Enemy) -> Enemy:
         """ Move an enemy based on their predefined velocity
 
         Args:
@@ -127,15 +127,14 @@ class Environment:
         enemy.set_position(cur_pos)
         return enemy
 
-    def move_all_enemies(self):
+    def move_all_enemies(self) -> List[Enemy]:
         updated_enemies = [self.move_enemy(enemy) for enemy in self.enemies]
         self.enemies = updated_enemies
-        [enemy.get_position() for enemy in updated_enemies]
         return updated_enemies
 
     ################################
     # This is literally the same as enemy functions above...
-    def add_reward(self, reward):
+    def add_reward(self, reward: Reward) -> None:
         self.rewards.append(reward)
         self.initial_rewards.append(reward.copy())
 
@@ -263,7 +262,7 @@ class Environment:
                             self.rewards.pop(i)
                         rewards_collected = True
                     except Exception as e:
-                        print(e)
+                        print("Its me the rarest exceptione ever which I'm sure will get fixed..", e)
 
         return collisions, rewards_collected
 
@@ -353,7 +352,7 @@ class Environment:
                                               e_vel_range[1])))
             self.add_enemy(enemy)
 
-        for i in range(_rand_int(num_rewards_range[0], num_rewards_range[1])):
+        for _ in range(_rand_int(num_rewards_range[0], num_rewards_range[1])):
             reward = Reward(size=_rand_int(reward_size_range[0],
                                            reward_size_range[1]),
 

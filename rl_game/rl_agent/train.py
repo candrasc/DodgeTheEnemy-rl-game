@@ -13,7 +13,7 @@ def main():
     env = Environment((700, 700))
     env.random_initialize(player_step_size_range=[3, 4],
                           player_size_range=[30, 31],
-                          # Let's see if it can learn to avoid one enemy and collect rewards
+                          
                           num_enemies_range=[15, 16],
                           e_vel_range=[1, 3],
                           enemy_size_range=[30, 31],

@@ -51,12 +51,11 @@ class Enemy(NonPlayerBase):
     """
     def __init__(self,  size = 30, step_size = 0.3, starting_pos = (1,1), velocity=(1,1)):
         super().__init__(size, step_size, starting_pos, velocity)
-        enemy_path = os.sep.join([current_directory, "object_images/enemy.png"])
-        try:
-            self.enemy = pygame.image.load(enemy_path).convert()
-            self.enemy = pygame.transform.scale(self.enemy,(self.size, self.size))
-        except:
-            pass
+        enemy_path = os.path.join(current_directory, "object_images/enemy.png")
+ 
+        enemy = pygame.image.load(enemy_path).convert()
+        self.enemy = pygame.transform.scale(enemy,(self.size, self.size))
+
 
 
 class Reward(NonPlayerBase):
@@ -65,10 +64,8 @@ class Reward(NonPlayerBase):
     """
     def __init__(self, reward_value = 10, size = 30, step_size = 0.3, starting_pos = (1,1), velocity=(1,1)):
         super().__init__(size, step_size, starting_pos, velocity)
-        reward_path = os.sep.join([current_directory, "object_images/reward_one.png"])
-        try:
-            self.reward = pygame.image.load(reward_path).convert()
-            self.reward = pygame.transform.scale(self.reward, (self.size, self.size))
-        except:
-            pass
+        reward_path = os.path.join(current_directory, "object_images/reward_one.png")
+
+        reward = pygame.image.load(reward_path).convert()
+        self.reward = pygame.transform.scale(reward, (self.size, self.size))
         self.reward_value = reward_value
