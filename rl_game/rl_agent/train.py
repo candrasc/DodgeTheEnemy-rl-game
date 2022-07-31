@@ -129,7 +129,7 @@ def main():
                 if trial % 50 == 0:
 
                     print(f'saving model at trial {trial}')
-                    direct = f"July7-{learning_rate}_LR-{num_steps_per_move}-FR-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
+                    direct = f"/models/July7-{learning_rate}_LR-{num_steps_per_move}-FR-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
                     dqn_agent.save_model(direct+f'/trial-{trial}')
 
                     with open(direct + "/results_dic.pkl", 'wb') as f:

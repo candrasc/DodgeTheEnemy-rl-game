@@ -52,9 +52,14 @@ class Enemy(NonPlayerBase):
     def __init__(self,  size = 30, step_size = 0.3, starting_pos = (1,1), velocity=(1,1)):
         super().__init__(size, step_size, starting_pos, velocity)
         enemy_path = os.path.join(current_directory, "object_images/enemy.png")
- 
-        enemy = pygame.image.load(enemy_path).convert()
-        self.enemy = pygame.transform.scale(enemy,(self.size, self.size))
+        try:
+            enemy = pygame.image.load(enemy_path).convert()
+            self.enemy = pygame.transform.scale(enemy,(self.size, self.size))
+        except pygame.error as e:
+            # When training the model we get pygame rendering errors we need to handle
+            msg = str(e)
+            if not "cannot convert without pygame.display" in msg:
+                raise e
 
 
 
@@ -65,7 +70,13 @@ class Reward(NonPlayerBase):
     def __init__(self, reward_value = 10, size = 30, step_size = 0.3, starting_pos = (1,1), velocity=(1,1)):
         super().__init__(size, step_size, starting_pos, velocity)
         reward_path = os.path.join(current_directory, "object_images/reward_one.png")
-
-        reward = pygame.image.load(reward_path).convert()
-        self.reward = pygame.transform.scale(reward, (self.size, self.size))
         self.reward_value = reward_value
+        try:
+            reward = pygame.image.load(reward_path).convert()
+            self.reward = pygame.transform.scale(reward, (self.size, self.size))
+        
+        except pygame.error as e:
+            # When training the model we get pygame rendering errors we need to handle
+            msg = str(e)
+            if not "cannot convert without pygame.display" in msg:
+                raise e

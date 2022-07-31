@@ -12,9 +12,14 @@ class Player:
     def __init__(self, player_number=1, player_size=30, step_size=0.3, position=(1,1)):
 
         player_path = os.path.join(current_directory, 'object_images/player_one.png ')
-
-        player = pygame.image.load(player_path).convert()
-        self.player = pygame.transform.scale(player, (player_size, player_size))
+        try:
+            player = pygame.image.load(player_path).convert()
+            self.player = pygame.transform.scale(player, (player_size, player_size))
+        except pygame.error as e:
+            # When training the model we get pygame rendering errors we need to handle
+            msg = str(e)
+            if not "cannot convert without pygame.display" in msg:
+                raise e
 
         self.player_number = player_number
         self.size = player_size
