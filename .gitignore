@@ -8,3 +8,4 @@ objects\__pycache__\players.cpython-38.pyc
 testing_conf.json
 Untitled.ipynb
 venv
+**/models/**

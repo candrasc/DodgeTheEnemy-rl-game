@@ -1,30 +1,36 @@
 import json
-from rl_game.game.environment.game_runner import run_game, initialize_env, create_static_images, \
-                                                 play_victory_screen, play_game_over_screen, restart_game
+import argparse
+from rl_game import run_game
 
-# with open("game_config.json", "rb") as f:
-#     config = json.load(f)
 
-with open("testing_conf.json", "rb") as f:
-    config = json.load(f)
+def run():
 
-if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    # Do you want to play or watch AI
+    parser.add_argument('--mode', '-m',
+                        help="Enter 'play' or 'ai'")
+    # Do you want dybamic or static game config
+    parser.add_argument('--config', '-c',
+                    help="Enter 'test' or 'game'")
+    args = parser.parse_args()
 
-    screen, board, game_over, victory_screen, clock = create_static_images()
-    Env = initialize_env(config)
+    with open("game_config.json", "rb") as f:
+        config = json.load(f)
+    
+    if args.config == 'game':
+        conf = config['play']
+    elif args.config == 'test':
+        conf = config['test']
+    else:
+        raise ValueError("config must be 'game' or 'test'")
+    
+    if args.mode == 'ai':
+        run_game.main_rl(conf)
+    elif args.mode == 'play':
+        run_game.main_person(conf)
+    else:
+        raise ValueError("mode must be 'ai' or 'play'")
 
-    while True:
-        victory, collision = run_game(Env, board, screen, clock)
-
-        play_victory_screen(screen, victory_screen, victory)
-
-        play_game_over_screen(screen, game_over, collision)
-
-        reset_same, random_reset = restart_game()
-
-        # Depending on key press, we restart the same game or a random new one
-        if reset_same == True:
-            Env.env_reset()
-
-        elif random_reset == True:
-            Env = initialize_env(config)
+    
+if __name__=='__main__':
+    run()
