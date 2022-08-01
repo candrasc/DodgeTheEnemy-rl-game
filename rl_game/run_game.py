@@ -7,7 +7,7 @@ import keras
 def main_rl(config: dict) -> None:
     screen, board, game_over, victory_screen, clock = GR.create_static_images()
     env = GR.initialize_env(config)
-    model = keras.models.load_model('rl_game/rl_agent/July7-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-800')
+    model = keras.models.load_model('rl_game/rl_agent/models/July31-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-800')
     print('model_loaded')
     agent = Agent(env,
                   model=model,

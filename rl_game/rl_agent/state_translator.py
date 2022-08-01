@@ -1,8 +1,9 @@
 import numpy as np
-
+import datetime
 
 class StateTranslator:
-    """
+    """WOW. What a fucking mess. Need to refactor.
+
     Used to translate the environment's object positions, sizes, speeds etc into a fixed size
     vector that can be passed to the RL agent
     """
@@ -12,19 +13,11 @@ class StateTranslator:
         self.board = np.zeros(env.board)
         self.n_obj = n_objects_in_state
         self.goods_in_game = len(env.rewards)
-        self.state_shape = (2 * (6 * self.n_obj + 6 * self.n_obj) +  # enemy and goods positions, velocities
-                            (4 + 1)# player attributes (wall dists, step_size)
-                            + 1)  #num enemies remaining
+        self.state_shape = 54  #num enemies remaining
         # Factors to divide state attributes by so they are less than 1
         self.size_scale = 100  # max object size
         self.position_scale = env.board[0]  # max board dimension
         self.velocity_scale = 5  # max velocity
-
-    def _get_x_y_coord(self, position):
-        """
-        Given a tuple, return the x and y coordinates
-        """
-        return position[0], position[1]
 
     def set_objects(self, player, enemies, goods):
         """
@@ -33,7 +26,7 @@ class StateTranslator:
         self.enemies = np.array(enemies)
         self.goods = np.array(goods)
 
-    def __translate_velocities(self, velocity_x_y):
+    def __translate_velocities(self, velocity):
         """
         Given a velocity param that includes an x and y velocity,
         translate it into a 6d vec (One hote encoding for x a y up or down (4 total), then abs value)
@@ -41,53 +34,47 @@ class StateTranslator:
         We can't just do 1 up 0, down as having 0 will occur when we have no object in that position
         to return a velocity, which will confuse the neural net
         """
-        x_vel = velocity_x_y[0]
-        y_vel = velocity_x_y[1]
+        x_vel = velocity[0]
+        y_vel = velocity[1]
 
-        vel_vec = np.zeros(6)
+        vel_vec = np.zeros(4)
 
-        if x_vel >= 1:
+        if x_vel >= 0:
             vel_vec[0] = 1
-        else:
+
+        if y_vel >= 0:
             vel_vec[1] = 1
 
-        if y_vel >= 1:
-            vel_vec[2] = 1
 
-        else:
-            vel_vec[3] = 1
-
-        vel_vec[4] = abs(x_vel)
-        vel_vec[5] = abs(y_vel)
+        vel_vec[2] = abs(x_vel)
+        vel_vec[3] = abs(y_vel)
 
         return vel_vec
 
     def _get_object_attributes(self):
 
+        def __get_velocity_position_size(units):
+            if len(units)>0:
+                unit_positions = []
+                unit_sizes = []
+                unit_velocities = []
+                for unit in units:
+                    vel = self.__translate_velocities(unit.get_velocity())
+                    unit_velocities.append(vel) 
+                    unit_sizes.append(unit.size)
+                    unit_positions.append(unit.get_position())
+                return unit_velocities, unit_positions, unit_sizes
+            else:
+                return [0], [0], [0]
+
+
         player_pos = np.array(self.player.get_position())
         player_size = np.array(self.player.size)
         player_step_size = np.array(self.player.step_size)
 
-        if len(self.enemies) > 0:
-            enemy_positions, enemy_sizes, enemy_velocities = zip(*((enemy.get_position(),
-                                                                    enemy.size,
-                                                                    enemy.get_velocity())
-                                                                   for enemy in self.enemies))
+        enemy_velocities, enemy_positions, enemy_sizes = __get_velocity_position_size(self.enemies)
 
-            enemy_velocities = [self.__translate_velocities(vel) for vel in enemy_velocities]
-
-        else:
-            enemy_positions, enemy_sizes, enemy_velocities = [0], [0], [0]
-
-        if len(self.goods) > 0:
-            good_positions, good_sizes, good_velocities = zip(*((good.get_position(),
-                                                                 good.size,
-                                                                 good.get_velocity())
-                                                                for good in self.goods))
-
-            good_velocities = [self.__translate_velocities(vel) for vel in good_velocities]
-        else:
-            good_positions, good_sizes, good_velocities = [0], [0], [0]
+        good_velocities, good_positions, good_sizes = __get_velocity_position_size(self.goods)
 
         enemy_positions = np.array(enemy_positions)
         enemy_sizes = np.array(enemy_sizes)
@@ -125,20 +112,16 @@ class StateTranslator:
 
         return distance
 
-    def _get_n_closest_objects(self, player_pos, player_size, obj_poss, obj_sizes, n_obj):
+    def _get_n_closest_objects(self, player_pos, player_size, obj_pos, obj_sizes, n_obj):
         """
         For now, we will just get the closest objects based on their position
         and radius... even though they are squares, this is good enough
         (the sizes will be inputs into the NN so it will be figured out then)
         """
 
-        # if len(obj_sizes)<=n_obj:
-        #     n_smallest_indicies = [i for i in range(len(obj_sizes))]
-        #
-        # else:
         distances = np.array([])
         for i in range(len(obj_sizes)):
-            dist = self._calc_distance(player_pos, obj_poss[i])
+            dist = self._calc_distance(player_pos, obj_pos[i])
             dist_true = abs(dist - player_size - obj_sizes[i])
             distances = np.append(distances, dist_true)
 
@@ -239,7 +222,7 @@ class StateTranslator:
                                                                     enemy_positions,
                                                                     enemy_sizes,
                                                                     n_obj_enemies)
-
+            
             close_enemies = self.enemies[n_smallest_enemy_indicies]
 
             enemy_distances = np.array([])
@@ -248,12 +231,7 @@ class StateTranslator:
                 enemy_distances = np.append(enemy_distances, e_dist_vec)
 
             enemy_distances = self.__fill_end_of_array(enemy_distances, self.n_obj * 6).flatten()
-            # ep = self.__fill_end_of_array(enemy_positions[n_smallest_enemy_indicies].flatten(),
-            #                        self.n_obj * 2)
-            #
-            # es = self.__fill_end_of_array(enemy_sizes[n_smallest_enemy_indicies].flatten(),
-            #                        self.n_obj)
-            #
+
             ev = self.__fill_end_of_array(enemy_velocities[n_smallest_enemy_indicies].flatten(),
                                           self.n_obj * 6)
 
@@ -277,18 +255,11 @@ class StateTranslator:
 
             goods_distances = self.__fill_end_of_array(goods_distances, self.n_obj * 6).flatten()
 
-            # gp = self.__fill_end_of_array(good_positions[n_smallest_good_indicies].flatten(),
-            #                        self.n_obj * 2)
-            #
-            # gs = self.__fill_end_of_array(good_sizes[n_smallest_good_indicies].flatten(),
-            #                        self.n_obj)
-
             gv = self.__fill_end_of_array(good_velocities[n_smallest_good_indicies].flatten(),
                                           self.n_obj * 6)
 
         else:
-            # gp = np.zeros(self.n_obj * 2)
-            # gs = np.zeros(self.n_obj)
+
             goods_distances = np.zeros(self.n_obj * 6)
             gv = np.zeros(self.n_obj * 6)
 
