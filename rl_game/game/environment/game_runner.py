@@ -120,7 +120,7 @@ def run_game(Env, board, screen, clock):
             return victory, collision_detected
 
 
-def run_game_with_agent(agent, Env, board, screen, clock):
+def run_game_with_agent(agent, env, board, screen, clock):
     black = (0,0,0)
     boardrect = board.get_rect()
 
@@ -131,9 +131,9 @@ def run_game_with_agent(agent, Env, board, screen, clock):
     # Create a state that is 4 frames to start as that is what we train with
     action = 1
     cur_state = np.array([])
-    for i in range(num_steps_per_move):
+    for _ in range(num_steps_per_move):
         new_player, new_enemies, new_goods, \
-        collision_mini, goods_collected = Env.env_take_step(action)
+        collision_mini, goods_collected = env.env_take_step(action)
 
         agent.StateTrans.set_objects(new_player, new_enemies, new_goods)
         new_state_mini, reward_mini, done_mini = agent.StateTrans.state_translation(collision_mini, goods_collected)
@@ -163,10 +163,10 @@ def run_game_with_agent(agent, Env, board, screen, clock):
         collision = False
 
         # Perform action x amount of times as we train with... ie one state is 4 frames
-        for i in range(num_steps_per_move):
+        for _ in range(num_steps_per_move):
             clock.tick(400)
             new_player, new_enemies, new_goods, \
-            collision_mini, goods_collected = Env.env_take_step(action)
+            collision_mini, goods_collected = env.env_take_step(action)
 
             agent.StateTrans.set_objects(new_player, new_enemies, new_goods)
             new_state_mini, reward_mini, done_mini = agent.StateTrans.state_translation(collision_mini, goods_collected)

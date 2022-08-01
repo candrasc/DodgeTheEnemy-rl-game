@@ -5,7 +5,7 @@ from rl_game.rl_agent import current_directory
 import numpy as np
 import pickle
 import os
-
+import keras
 
 
 def main():
@@ -33,10 +33,10 @@ def main():
     terminal_reward = 1000
 
     # Can load a previous model to speed up learning if you want
-    # model = keras.models.load_model('April21-0.001_LR-3_HL-2_obj_det-250r_-200p/trial-350_200_reward')
+    model = keras.models.load_model('./rl_game/rl_agent/models/July31-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-50')
 
     dqn_agent = Agent(env=env,
-                      # model = model,
+                      model = model,
                       epsilon=epsilon,
                       epsilon_min=min_epsilon)
 
@@ -129,7 +129,8 @@ def main():
                 if trial % 50 == 0:
 
                     print(f'saving model at trial {trial}')
-                    direct = f"/models/July31-{learning_rate}_LR-{num_steps_per_move}-FR-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
+                    
+                    direct = "./rl_game/rl_agent/models/July31-{learning_rate}_LR-{num_steps_per_move}-FR-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
                     dqn_agent.save_model(direct+f'/trial-{trial}')
 
                     with open(direct + "/results_dic.pkl", 'wb') as f:

@@ -306,5 +306,8 @@ class StateTranslator:
             Done = False
             Reward = -50
 
+        elif len(self.goods) == 0:
+            Done = True
+            Reward = +10 ** 6
 
         return state, Reward, Done
