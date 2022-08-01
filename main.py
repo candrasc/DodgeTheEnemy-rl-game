@@ -11,7 +11,7 @@ def run():
                         help="Enter 'play' or 'ai'")
     # Do you want dybamic or static game config
     parser.add_argument('--config', '-c',
-                    help="Enter 'test' or 'game'")
+                        help="Enter 'test' or 'game'")
     args = parser.parse_args()
 
     with open("game_config.json", "rb") as f:
