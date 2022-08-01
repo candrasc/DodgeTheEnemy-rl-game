@@ -131,7 +131,7 @@ def main():
                     full_save_path = os.path.join(file_location, relative_path, trial_path)
                     dqn_agent.save_model(full_save_path)
 
-                    with open(full_save_path + "/results_dic.pkl", 'wb') as f:
+                    with open(os.path.join(file_location, relative_path, "results_dic.pkl"), 'wb') as f:
                         pickle.dump(results_dic, f)
 
                 if trial % 100 == 0:

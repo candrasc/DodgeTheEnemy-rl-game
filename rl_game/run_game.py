@@ -1,13 +1,15 @@
 from rl_game.game.environment import game_runner as GR
 from rl_game.rl_agent.rl_agent import Agent
+import os
 import keras
 
 
 
-def main_rl(config: dict) -> None:
+def main_rl(config: dict, model_name: str) -> None:
     screen, board, game_over, victory_screen, clock = GR.create_static_images()
     env = GR.initialize_env(config)
-    model = keras.models.load_model('rl_game/rl_agent/models/July31-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-50')
+    model_path = os.path.join('rl_game/rl_agent/models/', model_name)
+    model = keras.models.load_model(model_path)
     print('model_loaded')
     agent = Agent(env,
                   model=model,

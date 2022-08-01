@@ -2,6 +2,7 @@ import json
 import argparse
 from rl_game import run_game
 
+MODEL_NAME = 'Aug1-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-300'
 
 def run():
 
@@ -25,7 +26,7 @@ def run():
         raise ValueError("config must be 'game' or 'test'")
     
     if args.mode == 'ai':
-        run_game.main_rl(conf)
+        run_game.main_rl(conf, MODEL_NAME)
     elif args.mode == 'play':
         run_game.main_person(conf)
     else:
