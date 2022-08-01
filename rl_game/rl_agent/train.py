@@ -10,33 +10,39 @@ import keras
 
 def main():
 
-    env = Environment((700, 700))
-    env.random_initialize(player_step_size_range=[3, 4],
-                          player_size_range=[30, 31],
-                          
-                          num_enemies_range=[15, 16],
-                          e_vel_range=[1, 3],
-                          enemy_size_range=[30, 31],
-
-                          num_rewards_range=[15, 16],
-                          r_vel_range=[1, 2],
-                          reward_size_range=[30, 31]
-                          )
-
     epsilon = .95
     min_epsilon = 0.5
+    steps_to_train = 20
 
-    trials = 10000
+    trials = 1000
     trial_len = 500
     pos_reward = 200
     neg_reward = -200
     terminal_reward = 1000
 
+
+    env_config = {
+                'player_step_size_range':[3, 4],
+                'player_size_range' : [30, 31],
+
+                'num_enemies_range' : [20, 21],
+                'e_vel_range' : [1, 3],
+                'enemy_size_range' : [30, 31],
+
+                'num_rewards_range' : [20, 21],
+                'r_vel_range' : [1, 2],
+                'reward_size_range' : [30, 31]
+                }
+
+    env = Environment((700, 700))
+    env.random_initialize(**env_config)
+
+
     # Can load a previous model to speed up learning if you want
-    model = keras.models.load_model('./rl_game/rl_agent/models/July31-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-50')
+    #model = keras.models.load_model('./rl_game/rl_agent/models/July31-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-50')
 
     dqn_agent = Agent(env=env,
-                      model = model,
+                      #model = model,
                       epsilon=epsilon,
                       epsilon_min=min_epsilon)
 
@@ -51,23 +57,13 @@ def main():
         results_dic[trial] = 0
         print('trial', trial)
 
-        env.random_initialize(player_step_size_range=[3, 4],
-                              player_size_range=[30, 31],
-                              # Let's see if it can learn to avoid one enemy and collect rewards
-                              num_enemies_range=[15, 16],
-                              e_vel_range=[1, 3],
-                              enemy_size_range=[30, 31],
-
-                              num_rewards_range=[15, 16],
-                              r_vel_range=[1, 2],
-                              reward_size_range=[30, 31]
-                              )
+        env.random_initialize(**env_config)
 
         player, enemies, goods = env.return_env_object_states()
 
         # Repeat same state 4 times to start to get right length of state vec
         cur_state = np.array([])
-        for i in range(num_steps_per_move):
+        for _ in range(num_steps_per_move):
             dqn_agent.StateTrans.set_objects(player, enemies, goods)
             cur_state_mini = dqn_agent.StateTrans.get_state()
             cur_state = np.append(cur_state, cur_state_mini)
@@ -83,7 +79,7 @@ def main():
             new_state = np.array([])
             reward = 0
             done = False
-            for i in range(num_steps_per_move):
+            for _ in range(num_steps_per_move):
                 new_player, new_enemies, new_goods, \
                 collision, goods_collected = env.env_take_step(action)
 
@@ -120,7 +116,7 @@ def main():
 
             cur_state = new_state
 
-            if step % 5 == 0:
+            if step % steps_to_train == 0:
                 dqn_agent.replay()  # internally iterates default (prediction) model
                 # iterates target model
                 dqn_agent.target_train()
@@ -129,18 +125,20 @@ def main():
                 if trial % 50 == 0:
 
                     print(f'saving model at trial {trial}')
-                    
-                    direct = "./rl_game/rl_agent/models/July31-{learning_rate}_LR-{num_steps_per_move}-FR-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
-                    dqn_agent.save_model(direct+f'/trial-{trial}')
+                    file_location = os.path.dirname(os.path.abspath(__file__))
+                    relative_path = f"models/Aug1-{learning_rate}_LR-{num_steps_per_move}-FR-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
+                    trial_path = f'trial-{trial}'
+                    full_save_path = os.path.join(file_location, relative_path, trial_path)
+                    dqn_agent.save_model(full_save_path)
 
-                    with open(direct + "/results_dic.pkl", 'wb') as f:
+                    with open(full_save_path + "/results_dic.pkl", 'wb') as f:
                         pickle.dump(results_dic, f)
 
                 if trial % 100 == 0:
                     # Reset the exploration every 100 trials
                     dqn_agent.epsilon = .50
                     dir_path = os.path.dirname(os.path.realpath(__file__))
-                    lines = os.path.join(dir_path, direct)
+                    lines = os.path.join(dir_path, full_save_path)
                     gen_report(lines)
                 break
 
