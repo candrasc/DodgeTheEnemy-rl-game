@@ -3,10 +3,11 @@ from rl_game.rl_agent.perf_viz import gen_report
 from rl_game.rl_agent.rl_agent import Agent
 from rl_game.rl_agent import current_directory
 import numpy as np
-import pickle
+import json
 import os
 import keras
 
+FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 def main():
 
@@ -15,7 +16,7 @@ def main():
     steps_to_train = 20
 
     trials = 1000
-    trial_len = 500
+    trial_len = 1000
     pos_reward = 200
     neg_reward = -200
     terminal_reward = 1000
@@ -38,11 +39,12 @@ def main():
     env.random_initialize(**env_config)
 
 
-    # Can load a previous model to speed up learning if you want
-    #model = keras.models.load_model('./rl_game/rl_agent/models/July31-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-50')
+    model_name = 'Aug1-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-850'
+    model_path = os.path.join(FILE_PATH, 'models', model_name)
+    model = keras.models.load_model(model_path)
 
     dqn_agent = Agent(env=env,
-                      #model = model,
+                      model = model,
                       epsilon=epsilon,
                       epsilon_min=min_epsilon)
 
@@ -125,21 +127,22 @@ def main():
                 if trial % 50 == 0:
 
                     print(f'saving model at trial {trial}')
-                    file_location = os.path.dirname(os.path.abspath(__file__))
-                    relative_path = f"models/Aug1-{learning_rate}_LR-{num_steps_per_move}-FR-{num_obj_detected}_obj_det-{pos_reward}r_{neg_reward}p"
+                    
+                    relative_path = f"models/Aug1-transfer"
                     trial_path = f'trial-{trial}'
-                    full_save_path = os.path.join(file_location, relative_path, trial_path)
+                    full_save_path = os.path.join(FILE_PATH, relative_path, trial_path)
                     dqn_agent.save_model(full_save_path)
 
-                    with open(os.path.join(file_location, relative_path, "results_dic.pkl"), 'wb') as f:
-                        pickle.dump(results_dic, f)
+                    with open(os.path.join(FILE_PATH, relative_path, "results_dic.json"), 'w') as f:
+                        json.dump(results_dic, f)
+                    
+                    lines = os.path.join(FILE_PATH, relative_path)
+                    gen_report(lines)
 
                 if trial % 100 == 0:
                     # Reset the exploration every 100 trials
                     dqn_agent.epsilon = .50
-                    dir_path = os.path.dirname(os.path.realpath(__file__))
-                    lines = os.path.join(dir_path, full_save_path)
-                    gen_report(lines)
+
                 break
 
 
