@@ -1,11 +1,12 @@
-from rl_game.game.environment.environment import Environment
-from rl_game.rl_agent.perf_viz import gen_report
-from rl_game.rl_agent.rl_agent import Agent
-from rl_game.rl_agent import current_directory
-import numpy as np
 import json
 import os
+
 import keras
+import numpy as np
+from rl_game.game.environment.environment import Environment
+from rl_game.rl_agent import current_directory
+from rl_game.rl_agent.perf_viz import gen_report
+from rl_game.rl_agent.rl_agent import Agent
 
 FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,12 +40,12 @@ def main():
     env.random_initialize(**env_config)
 
 
-    model_name = 'Aug1-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-850'
-    model_path = os.path.join(FILE_PATH, 'models', model_name)
-    model = keras.models.load_model(model_path)
+    # model_name = 'Aug1-0.001_LR-4-FR-2_obj_det-200r_-200p/trial-850'
+    # model_path = os.path.join(FILE_PATH, 'models', model_name)
+    # model = keras.models.load_model(model_path)
 
     dqn_agent = Agent(env=env,
-                      model = model,
+                     # model = model,
                       epsilon=epsilon,
                       epsilon_min=min_epsilon)
 
@@ -55,7 +56,7 @@ def main():
 
     # Record sum of reward per trial for plotting
     results_dic = {}
-    for trial in range(trials):
+    for trial in range(trials+1):
         results_dic[trial] = 0
         print('trial', trial)
 
@@ -128,7 +129,7 @@ def main():
 
                     print(f'saving model at trial {trial}')
                     
-                    relative_path = f"models/Aug1-transfer"
+                    relative_path = f"models/Aug2-wide-nowallpen"
                     trial_path = f'trial-{trial}'
                     full_save_path = os.path.join(FILE_PATH, relative_path, trial_path)
                     dqn_agent.save_model(full_save_path)

@@ -2,19 +2,18 @@
 Create a visualization of reward per trial for a trained agent
 """
 
-import pickle, os
-import seaborn as sns
+import json, os
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 import pandas as pd
 
 def gen_report(directory):
 
-    filename = "/results_dic.pkl"
+    filename = "/results_dic.json"
     file_path = directory + filename
 
     with open(file_path, 'rb') as f:
-        results = pickle.load(f)
+        results = json.load(f)
 
     df = pd.DataFrame.from_dict(results, orient='index', columns = ['reward'])
 
