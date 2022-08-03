@@ -42,7 +42,7 @@ def initialize_env(config, board_size = (700, 700)):
 
 def create_static_images(board_size = (700, 700)):
 
-    size = 700, 700
+    size = board_size
     screen = pygame.display.set_mode(size)
 
     board = pygame.image.load('rl_game/game/environment/images/board.jpg').convert()
@@ -66,7 +66,6 @@ def update_objects_ingame(screen, objects, enemies=True):
     and don't need the enemies=True param
     """
     if enemies:
-        
         for i in objects:
             screen.blit(i.enemy, i.get_position())
     if not enemies:

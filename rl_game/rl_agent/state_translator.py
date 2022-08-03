@@ -301,10 +301,10 @@ class StateTranslator:
             Done = False
             Reward = +50
 
-        elif hit_wall:
-            print('hitwall')
-            Done = False
-            Reward = -50
+        # elif hit_wall:
+        #     print('hitwall')
+        #     Done = False
+        #     Reward = -50
 
         elif len(self.goods) == 0:
             Done = True

@@ -2,7 +2,7 @@ import json
 import argparse
 from rl_game import run_game
 
-MODEL_NAME = 'Aug1-transfer/trial-100'
+MODEL_NAME = 'Aug2-wide-nowallpen/trial-200'
 
 def run():
 

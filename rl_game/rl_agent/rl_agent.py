@@ -42,7 +42,10 @@ class Agent:
 
     def create_model(self):
         model = Sequential()
-        model.add(Dense(50, input_dim=self.state_shape, activation="relu"))
+        model.add(Dense(500, input_dim=self.state_shape, activation="relu"))
+        model.add(Dense(1000, input_dim=self.state_shape, activation="relu"))
+        model.add(Dense(500, input_dim=self.state_shape, activation="relu"))
+        model.add(Dense(200, input_dim=self.state_shape, activation="relu"))
         model.add(Dense(4))
         model.compile(loss="MSE",
                       optimizer=Adam(lr=self.learning_rate))
