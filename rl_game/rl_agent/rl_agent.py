@@ -55,7 +55,7 @@ class Agent:
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
         if np.random.random() < self.epsilon:
-            return random.choice(self.env.action_space)
+            return random.choice(self.env.ACTION_SPACE)
 
         action_values = self.model.predict(state.reshape(-1, self.state_shape))[0]
         action = np.argmax(action_values)

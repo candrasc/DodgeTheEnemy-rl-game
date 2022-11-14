@@ -8,6 +8,7 @@ import random
 
 
 class Environment:
+    ACTION_SPACE = [0, 1, 2, 3]
 
     def __init__(self, board_dimensions=(700, 700)):
         self.board = board_dimensions
@@ -21,7 +22,6 @@ class Environment:
         self.initial_player = None
         self.initial_rewards = []
         self.score = None
-        self.action_space = [0, 1, 2, 3]
 
     def add_player(self, player: Player):
         """ Add a player to the environment and record its initial state
