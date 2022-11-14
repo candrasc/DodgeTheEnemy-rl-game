@@ -101,7 +101,7 @@ def run_game(Env, board, screen, clock):
         player, enemies, rewards, collision, rewards_collected = Env.env_take_step(move)
         state_trans.set_objects(player, enemies, rewards)
         state_translated, reward, _ = state_trans.state_translation(collision, rewards_collected)
-        print('state ', state_translated)
+
         #print('reward', reward)
 
         screen.blit(board, boardrect)
