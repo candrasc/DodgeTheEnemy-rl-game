@@ -91,7 +91,7 @@ def main():
                                                                                                 goods_collected)
                 new_state = np.append(new_state, new_state_mini)
                 reward += reward_mini
-                if done_mini == True:
+                if done_mini:
                     done = True
 
             # Ensure rewards are consistent

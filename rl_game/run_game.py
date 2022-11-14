@@ -26,10 +26,10 @@ def main_rl(config: dict, model_name: str) -> None:
         reset_same, random_reset = GR.restart_game()
 
         # Depending on key press, we restart the same game or a random new one
-        if reset_same == True:
+        if reset_same:
             env.env_reset()
 
-        elif random_reset == True:
+        elif random_reset:
             env = GR.initialize_env(config)
 
 def main_person(config: dict) -> None:
@@ -46,10 +46,10 @@ def main_person(config: dict) -> None:
         reset_same, random_reset = GR.restart_game()
 
         # Depending on key press, we restart the same game or a random new one
-        if reset_same == True:
+        if reset_same:
             env.env_reset()
 
-        elif random_reset == True:
+        elif random_reset:
             env = GR.initialize_env(config)
 
 

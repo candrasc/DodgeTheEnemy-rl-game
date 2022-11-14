@@ -81,7 +81,7 @@ def run_game(Env, board, screen, clock):
     victory = False
 
     state_trans = StateTranslator(Env, 2)
-    while collision_detected == False and victory == False:
+    while not collision_detected and not victory:
         # Clock locks framerate and prevents stuttering
         clock.tick(100)
         screen.fill(black)
@@ -114,7 +114,7 @@ def run_game(Env, board, screen, clock):
             victory = True
             return victory, collision_detected
 
-        if collision == True:
+        if collision:
             collision_detected = True
             return victory, collision_detected
 
@@ -139,7 +139,7 @@ def run_game_with_agent(agent, env, board, screen, clock):
         cur_state = np.append(cur_state, new_state_mini)
 
     step_count = 0
-    while collision_detected == False and victory == False:
+    while not collision_detected and not victory:
         # Clock locks framerate and prevents stuttering
         step_count += 1
         print(step_count)
@@ -189,7 +189,7 @@ def run_game_with_agent(agent, env, board, screen, clock):
             victory = True
             return victory, collision_detected
 
-        if collision == True:
+        if collision:
             collision_detected = True
             return victory, collision_detected
 
@@ -215,7 +215,7 @@ def restart_game():
 
 def play_victory_screen(screen, victory_screen, victory):
     black = (0,0,0)
-    while victory == True:
+    while victory:
 
         screen.fill(black)
         screen.blit(victory_screen, (50,50))
@@ -232,7 +232,7 @@ def play_victory_screen(screen, victory_screen, victory):
 
 def play_game_over_screen(screen, game_over, collision):
     black = (0,0,0)
-    while collision == True:
+    while collision:
         screen.fill(black)
         screen.blit(game_over, (50,50))
         pygame.display.update()
