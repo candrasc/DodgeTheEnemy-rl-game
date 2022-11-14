@@ -332,11 +332,11 @@ class Environment:
         self.add_player(player)
 
         player_pos = player.get_position()
+        # Avoid starting the sim with the player on an enemy
         avoid_squares_x = list(range(player_pos[0] - 50, player_pos[0] + 50))
-
         avoid_squares_y = list(range(player_pos[1] - 50, player_pos[1] + 50))
 
-        for i in range(_rand_int(num_enemies_range[0], num_enemies_range[1])):
+        for _ in range(_rand_int(num_enemies_range[0], num_enemies_range[1])):
             e_pos_x = random.choice(list(set(range(pos_range[0], pos_range[1])) - set(avoid_squares_x)))
             e_pos_y = random.choice(list(set(range(pos_range[0], pos_range[1])) - set(avoid_squares_y)))
 
